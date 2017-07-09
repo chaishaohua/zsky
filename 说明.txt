@@ -1,8 +1,10 @@
 说明：
 程序基于本人修复的手撕包菜爬虫，python实现的磁力搜索网站，代码比较烂，请轻喷！
 少数功能未完成：搜索排行榜、浏览排行榜、浏览热度、DMCA投诉
-没有使用sphinx进行索引，而是用redis缓存访问页面，以后可能会做调整
-模板引擎是jinja2，编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
+
+搜索：没有使用sphinx进行索引，而是用redis缓存访问页面，以后可能会做调整
+相关推荐：使用jieba分词，比sphinx的中文分词效果好
+模板：模板引擎是jinja2，编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
 
 实验环境：centos7 python2.7
 
