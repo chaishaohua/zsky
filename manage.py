@@ -120,22 +120,6 @@ class Search_Tags(db.Model):
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
     tag = db.Column(db.String(100),nullable=False)
 
-class Top_Hash(db.Model):
-    """ 热门浏览文件 """
-    __tablename__ = 'top_hash'
-    id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    log_time = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
-    hash_id = db.Column(db.Integer,nullable=False)
-    ip = db.Column(db.String(30),nullable=False)
-
-class Top_Tag(db.Model):
-    """ 热门搜索记录 """
-    __tablename__ = 'top_tag'
-    id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    log_time = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
-    keyword = db.Column(db.String(100),nullable=False)
-    ip = db.Column(db.String(30),nullable=False)
-
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
@@ -154,7 +138,7 @@ class User(db.Model, UserMixin):
         return self.username
 
 def make_shell_context():
-    return dict(app=app,db=db,Search_Filelist=Search_Filelist,Search_Hash=Search_Hash,Search_Keywords=Search_Keywords,Search_Statusreport=Search_Statusreport,Search_Tags=Search_Tags,Top_Hash=Top_Hash,Top_Tag=Top_Tag,User=User)
+    return dict(app=app,db=db,Search_Filelist=Search_Filelist,Search_Hash=Search_Hash,Search_Keywords=Search_Keywords,Search_Statusreport=Search_Statusreport,Search_Tags=Search_Tags,User=User)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
@@ -298,8 +282,6 @@ admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(UserView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
 admin.add_view(UserView(Search_Statusreport, db.session,name='爬取统计'))
-admin.add_view(UserView(Top_Tag, db.session,name='最爱搜'))
-admin.add_view(UserView(Top_Hash, db.session,name='最爱看'))
 admin.add_view(UserView(User, db.session,name='用户管理'))
 
 
