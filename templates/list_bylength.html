@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>{{query}} - 搜索结果 - 纸上烤鱼磁力链接,磁力搜索</title>
+<meta name="keywords" content=""/>
+<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
+<meta name="viewport" content="width=device-width"/>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
+<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+</head>
+<body>
+<div id="wrapper">
+<div class="top-bar">﻿ <span class="first"><a href="/">种子搜索</a></span>
+<span class="second"><a href="/tags">种子大全</a></span>
+<span class="second"><a href="/top">排行</a></span>
+<select autocomplete="off" onchange="changeLanguage(this.value)">
+<option value="KR">한국어</option>
+<option value="EN">English</option>
+<option value="JP">日本語</option>
+<option value="CN" selected>简体中文</option>
+<option value="HK">繁體中文</option>
+</select>
+</div>
+<div class="header-div">
+<form class="search-form"  action="{{url_for('search_results')}}" method="get">
+<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
+{{form.hidden_tag()}}
+{{form.search(id="search")}}
+{{form.submit(class="blue",id="btnSearch")}}
+</form>
+<script type="text/javascript">
+                     document.getElementById("search").focus();
+                     document.forms[0].onsubmit = function (e) {
+                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
+                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
+                     };
+				</script>
+</div>
+<div id="sort-bar">
+<a href="#"><b>文件大小</b></a>
+<a href="{{url_for('search_results',query=query)}}">时间先后</a>
+</div>
+<div id="content">
+<div id="wall">
+<div class="search-statu">
+<span>共找到 {{pagination.total}} 条关于 {{query}} 的结果</span>
+</div>
+<div class="adsense" style="position:relative"></div>
+<div class="col-md-8">
+{% for hash in hashs %}  
+<div class="search-item detail-width">
+<div class="item-title">
+<h3><a title="{{ hash.name }}" href="{{url_for('detail',info_hash=hash.info_hash)}}" target="_blank">{{ hash.name }}</a></h3>
+</div>
+<div class="item-list">
+</div>
+<div class="item-bar">
+<span class="cpill fileType1">{{hash.category}}</span>
+<span>创建时间：<b>{{hash.create_time}}</b></span>
+<span>文件大小：<b>
+{% if hash.length>1073741824 %}
+<b class="cpill yellow-pill">{{(hash.length/1073741824)|round(2)}}G</b>
+{% else %}<b class="cpill blue-pill">{{(hash.length/1048576)|round(2)}}M</b>
+{%endif%}</span>
+<span>热度：<b>{{hash.requests}}</b></span>
+<span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash.info_hash | upper}}" >磁力链接</a></span>
+<a href="magnet:?xt=urn:btih:{{hash.info_hash|upper}}" class="download">磁力链接</a> 
+</div>
+</div>
+{% endfor %} 
+<div class="bottom-pager detail-width">
+<a href="{% if pagination.has_prev %}{{url_for('search_results_bylength',query=query,page=pagination.page-1)}}{% else %}#{% endif %}" >&lt;&lt;</a> 
+  {% for page in pagination.iter_pages() %}
+    {% if page %}
+      {% if page != pagination.page %}
+        <a href="{{ url_for('search_results_bylength', query=query,page=page) }}">{{ page }}</a>
+      {% else %}
+        <span>{{ page }}</span>
+      {% endif %}
+    {% else %}
+      …
+    {% endif %}
+  {% endfor %}  
+<a href="{%if pagination.has_next %}{{url_for('search_results_bylength',query=query,page=pagination.page+1)}}{% else %}#{% endif %}" >&gt;&gt;</a>
+
+</div>
+</div>
+<div class="col-md-2">
+<div class="search-notice sidebar-width">电影磁力链接,电影bt种子下载,电影迅雷下载相关资源由用户搜索指令自动获取，结果来源于网络，本站不存储任何资料，亦不承担任何责任，请于24小时内删除！</div>
+<div id="latest-search" class="sidebar-width">
+<span class="latest-desc">大家对这些感兴趣：</span>
+{%for tag in tags%}
+<span><a href="/search/{{tag.tag}}">{{tag.tag}}</a></span>
+{%endfor%}
+</div>
+</div>
+</div>
+</div>
+<div class="push">
+</div>
+</div>
+<div class="footer">
+<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
+</div>
+<script charset="gbk" type="text/javascript" src="http://www.baidu.com/js/opensug.js"></script>
+<script type="text/javascript">
+             var params = { "XOffset": 0, "YOffset": 0, "fontColor": "#444", "fontColorHI": "#000", "fontSize": "16px", "fontFamily": "arial", "borderColor": "gray", "bgcolorHI": "#ebebeb", "sugSubmit": false };BaiduSuggestion.bind("search", params);
+       </script>
+</body>
+</html>
