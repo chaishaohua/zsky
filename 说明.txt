@@ -1,11 +1,11 @@
 说明：
-程序基于本人修复的手撕包菜爬虫，python实现的磁力搜索网站，代码比较烂，请轻喷！
-少数功能未完成：搜索排行榜、浏览排行榜、浏览热度、DMCA投诉
+在小虾的simdht爬虫上修复后可以7*24爬取的爬虫，python实现的磁力搜索网站，代码比较烂，请轻喷！
+部分功能未完成：搜索排行榜、浏览排行榜、DMCA投诉（其实是不想做）
 
 搜索：没有使用sphinx进行索引，而是用redis缓存访问页面，以后可能会做调整
 相关推荐：使用jieba分词，比sphinx的中文分词效果好
 模板：模板引擎是jinja2，编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
-
+后台：可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看爬取统计（其实这只是请求数量统计，不是资源数量统计）、管理后台用户
 实验环境：centos7 python2.7
 
 安装：
@@ -29,7 +29,10 @@ python manage.py init_db
 #建表
 python manage.py create_user
 #按照提示属于用户名、密码、邮箱
-nohup gunicorn -k gevent mange:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&  
+nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:5000 --reload>/dev/zero 2>&1&
+#访问日志是当前目录下zsky.log，错误日志是当前目录下zsky_err.log
+#如果不想要日志 就运行下面这条命令
+#nohup gunicorn -k gevent mange:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&  
 nohup python simdht_worker.py >/dev/zero 2>&1&
 现在访问http://IP 网站能够正常运行，解析域名即可完成部署
 
