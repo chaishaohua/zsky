@@ -128,9 +128,9 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
 
     try:
         try:
-            print '\n', 'Saved', info['info_hash'], info['name'], (time.time()-start_time), 's', address[0], geoip.country_name_by_addr(address[0]),
+            print '\n', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'Saved', info['info_hash'], info['name'], (time.time()-start_time), 's', address[0], geoip.country_name_by_addr(address[0]),
         except:
-            print '\n', 'Saved', info['info_hash'], sys.exc_info()[1]
+            print '\n',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Saved', info['info_hash'], sys.exc_info()[1]
         ret = dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
             'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
             (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
