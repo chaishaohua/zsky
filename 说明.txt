@@ -29,7 +29,7 @@ systemctl enable mariadb.service
 systemctl start redis.service
 systemctl enable redis.service
 mysql -uroot  -e"create database zsky default character set utf8mb4;" 
-mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024" 
+mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 10000;" 
 python manage.py init_db
 #建表
 python manage.py create_user
