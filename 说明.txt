@@ -1,40 +1,53 @@
 说明：
-在小虾的simdht爬虫上修复后可以7*24爬取的爬虫，python实现的磁力搜索网站，代码比较烂，请轻喷！
+在ssbc爬虫的基础上修复，现在可以7*24爬取的爬虫，修改了爬取策略，只入库音乐、电影、电子书。python实现的磁力搜索网站，代码比较烂，请轻喷！
 部分功能未完成：搜索排行榜、浏览排行榜、DMCA投诉（其实是不想做）
 
-搜索：没有使用sphinx进行索引，而是用redis缓存访问页面，以后可能会做调整
+搜索：和ssbc相比，没使用sphinx进行索引，而是用redis缓存访问页面
 相关推荐：使用jieba分词，比sphinx的中文分词效果好
-模板：模板引擎是jinja2，编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
-后台：可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看爬取统计（其实这只是请求数量统计，不是资源数量统计）、管理后台用户
+  
+模板：模板在templates目录，模板引擎是jinja2（非常易读），编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
+后台：可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看每天爬取的资源数量、管理后台用户
+  
 实验环境：centos7 python2.7
 
 安装：
+文件上传到主机上
 tar zxvf zsky.tar.gz
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
 systemctl stop iptables.service  
 systemctl disable iptables.service  
 setenforce 0  
-sed -i s/"SELINUX=enforcing"/"SELINUX=disabled"/g  /etc/selinux/config
+sed -i s/"SELINUX=enforcing"/"SELINUX=disabled"/g  /etc/sysconfig/selinux
 cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install epel-release python-pip redis
 pip install -r requirements.txt
+pip install redis
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
 systemctl start redis.service
 systemctl enable redis.service
 mysql -uroot  -e"create database zsky default character set utf8mb4;" 
+mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024" 
 python manage.py init_db
 #建表
 python manage.py create_user
-#按照提示属于用户名、密码、邮箱
-nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:5000 --reload>/dev/zero 2>&1&
-#访问日志是当前目录下zsky.log，错误日志是当前目录下zsky_err.log
+#按照提示输入用户名、密码、邮箱
+nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&
+#开启网站访问，访问日志是当前目录下zsky.log，错误日志是当前目录下zsky_err.log
 #如果不想要日志 就运行下面这条命令
-#nohup gunicorn -k gevent mange:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&  
-nohup python simdht_worker.py >/dev/zero 2>&1&
-现在访问http://IP 网站能够正常运行，解析域名即可完成部署
+#nohup gunicorn -k gevent manage:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&  
+nohup python simdht_worker.py  2>&1&
+#开启爬虫并写日志，如果有错误请提交日志文件nohup.out给我
 
+现在应该访问http://IP 了，解析域名即可完成部署
 后台地址http://IP/admin
 
+#开机自启动
+chmod +x /etc/rc.d/rc.local
+echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
+echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
+echo "cd /root/zsky" >> /etc/rc.d/rc.local
+echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
+echo "nohup gunicorn -k gevent manage:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
