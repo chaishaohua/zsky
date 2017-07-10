@@ -71,11 +71,11 @@
 </div>
 {% endfor %} 
 <div class="bottom-pager detail-width">
-<a href="{% if pagination.has_prev %}{{url_for('search_results_bylength',query=query,page=pagination.page-1)}}{% else %}#{% endif %}" >&lt;&lt;</a> 
+<a href="{% if pagination.has_prev %}{{url_for('search_results_bylength',querys=query,page=pagination.page-1)}}{% else %}#{% endif %}" >&lt;&lt;</a> 
   {% for page in pagination.iter_pages() %}
     {% if page %}
       {% if page != pagination.page %}
-        <a href="{{ url_for('search_results_bylength', query=query,page=page) }}">{{ page }}</a>
+        <a href="{{ url_for('search_results_bylength', querys=query,page=page) }}">{{ page }}</a>
       {% else %}
         <span>{{ page }}</span>
       {% endif %}
@@ -83,7 +83,7 @@
       …
     {% endif %}
   {% endfor %}  
-<a href="{%if pagination.has_next %}{{url_for('search_results_bylength',query=query,page=pagination.page+1)}}{% else %}#{% endif %}" >&gt;&gt;</a>
+<a href="{%if pagination.has_next %}{{url_for('search_results_bylength',querys=query,page=pagination.page+1)}}{% else %}#{% endif %}" >&gt;&gt;</a>
 
 </div>
 </div>
