@@ -67,9 +67,9 @@ nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log 
 #如果不想要日志 就运行下面这条命令
 #nohup gunicorn -k gevent manage:app -b 0.0.0.0:80 --reload>/dev/zero 2>&1&  
 nohup python simdht_worker.py  2>&1&
-#开启爬虫并写日志，如果有错误请提交日志文件nohup.out给我
+#开启爬虫并写日志，如果爬虫有问题请提交日志文件nohup.out给我
 
-现在应该访问http://IP 了，解析域名即可完成部署
+现在应该能访问http://IP 了，解析域名即可完成部署
 后台地址http://IP/admin
 
 #开机自启动
