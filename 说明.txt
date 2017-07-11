@@ -6,6 +6,7 @@
 后台可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看每天爬取的资源数量、管理后台用户。
 修改数据库密码后请修改manage.py里面的mysql+pymysql://root:后面的内容和simdht_work.py里面的DB_PASS
 实验环境：centos7 python2.7
+理论上支持python3，以及Ubuntu Debian等系统
 
 安装：
 文件上传到主机上
@@ -57,7 +58,9 @@ systemctl enable mariadb.service
 systemctl start redis.service
 systemctl enable redis.service
 mysql -uroot  -e"create database zsky default character set utf8mb4;" 
+#utf8mb4比utf8更优秀
 mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 10000;" 
+#建立并优化mysql数据库参数
 python manage.py init_db
 #建表
 python manage.py create_user
