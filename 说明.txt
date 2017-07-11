@@ -52,7 +52,6 @@ cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install epel-release python-pip redis
 pip install -r requirements.txt
-pip install redis
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
 systemctl start redis.service
