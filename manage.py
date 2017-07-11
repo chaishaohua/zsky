@@ -58,12 +58,12 @@ class LoginForm(FlaskForm):
     password=PasswordField('密码',validators=[DataRequired(),Length(1,20)])
     #rememberme = BooleanField('记住我')
     #submit=SubmitField('登录')
-    def validate_login(self, field):
-        user = self.get_user()
-        if user is None:
-            raise ValidationError('用户名错误！')
-        if not check_password_hash(user.password, self.password.data):
-            raise ValidationError('密码错误！')
+    #def validate_login(self, field):
+    #    user = self.get_user()
+    #    if user is None:
+    #        raise ValidationError('用户名错误！')
+    #    if not check_password_hash(user.password, self.password.data):
+    #        raise ValidationError('密码错误！')
     def get_user(self):
         return db.session.query(User).filter_by(name=self.name.data).first()
 
@@ -164,7 +164,7 @@ def make_cache_key(*args, **kwargs):
 
 @app.route('/search', methods = ['GET','POST'])
 @app.route('/search/<querys>/',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+@cache.cached(timeout=60*60*12,key_prefix=make_cache_key)
 def search_results(querys):
     u=Search_Tags(tag=querys)
     db.session.add(u)
@@ -173,7 +173,7 @@ def search_results(querys):
     page=request.args.get('page',1,type=int)
     pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(querys[0]),Search_Hash.name.contains(querys[1]),Search_Hash.name.contains(querys[-1])).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
     hashs=pagination.items
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
     if form.validate_on_submit():
         return url_for('search_results', querys = form.search.data)
@@ -182,13 +182,13 @@ def search_results(querys):
 
 @app.route('/search', methods = ['GET','POST'])
 @app.route('/search/<querys>/bylength',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+@cache.cached(timeout=60*60*12,key_prefix=make_cache_key)
 def search_results_bylength(querys):
     query=querys.split(' ')
     page=request.args.get('page',1,type=int)
     pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(querys[0]),Search_Hash.name.contains(querys[1]),Search_Hash.name.contains(querys[-1])).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
     hashs=pagination.items
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
     if form.validate_on_submit():
         return url_for('search_results', query = form.search.data)
@@ -200,17 +200,11 @@ def search_results_bylength(querys):
 def detail(info_hash):
     hash=Search_Hash.query.filter_by(info_hash=info_hash).first()
     fenci_list=jieba.cut(hash.name, cut_all=False)
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
     if form.validate_on_submit():
         return url_for('search_results', query = form.search.data)
     return render_template('detail.html',form=form,hash=hash,fenci_list=fenci_list)
-
-
-@app.route("/logout",methods=["GET","POST"])
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
 
 
 @app.errorhandler(404)
@@ -230,7 +224,12 @@ class MyAdminIndexView(AdminIndexView):
         form = LoginForm(request.form)
         if helpers.validate_form_on_submit(form):
             user = form.get_user()
-            login_user(user)
+            if user is None:
+                flash('用户名错误！')
+            elif not check_password_hash(user.password, form.password.data):
+                flash('密码错误！')
+            elif user is not None and check_password_hash(user.password, form.password.data):
+                login_user(user)
         if current_user.is_authenticated:
             return redirect(url_for('.index'))
         self._template_args['form'] = form
