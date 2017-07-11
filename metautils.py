@@ -18,7 +18,7 @@ cats = {
 def get_label(name):
     if name in cats:
         return cats[name]
-    return u'Others'
+    return u'其他'
 
 def get_label_by_crc32(n):
     for k in cats:
