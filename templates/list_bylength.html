@@ -30,13 +30,7 @@
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-<script type="text/javascript">
-                     document.getElementById("search").focus();
-                     document.forms[0].onsubmit = function (e) {
-                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
-                     };
-				</script>
+
 </div>
 <div id="sort-bar">
 <a href="#"><b>文件大小</b></a>
@@ -66,7 +60,7 @@
 {%endif%}</span>
 <span>热度：<b>{{hash.requests}}</b></span>
 <span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash.info_hash | upper}}" >磁力链接</a></span>
-<a href="magnet:?xt=urn:btih:{{hash.info_hash|upper}}" class="download">磁力链接</a> 
+
 </div>
 </div>
 {% endfor %} 
