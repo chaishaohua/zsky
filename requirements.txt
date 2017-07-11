@@ -17,3 +17,4 @@ Flask_Moment==0.5.1
 DBUtils==1.2
 gunicorn==19.7.1
 gevent==1.2.2
+redis==2.10.5
