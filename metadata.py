@@ -1,4 +1,8 @@
-# coding: utf-8
+#encoding:utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import traceback
 import pygeoip
 import threading
