@@ -9,6 +9,11 @@
 # License.
 
 # Written by Petru Paler
+#encoding:utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 
 def decode_int(x, f):
