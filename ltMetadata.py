@@ -1,4 +1,8 @@
-#coding: utf8
+#encoding:utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import threading
 import traceback
 import random
