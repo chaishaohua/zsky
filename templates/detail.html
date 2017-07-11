@@ -30,13 +30,7 @@
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-<script type="text/javascript">
-                     document.getElementById("search").focus();
-                     document.forms[0].onsubmit = function (e) {
-                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
-                     };
-				</script>
+
 </div>
 
 <div id="content">
