@@ -1,13 +1,10 @@
 说明：
 在ssbc爬虫的基础上修复，现在可以7*24爬取的爬虫，修改了爬取策略，只入库音乐、电影、电子书。python实现的磁力搜索网站，代码比较烂，请轻喷！
-部分功能未完成：搜索排行榜、浏览排行榜、DMCA投诉（其实是不想做）
-
-搜索：和ssbc相比，没使用sphinx进行索引，而是用redis缓存访问页面
-相关推荐：使用jieba分词，比sphinx的中文分词效果好
-  
-模板：模板在templates目录，模板引擎是jinja2（非常易读），编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/
-后台：可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看每天爬取的资源数量、管理后台用户
-  
+搜索排行榜、浏览排行榜、DMCA投诉的功能未完成（其实是不想做）
+和ssbc相比，没使用sphinx进行索引，而是用redis缓存访问页面，使用jieba分词，比sphinx的中文分词效果好。
+模板在templates目录，模板引擎是jinja2（非常易读），编写自己的专属模板非常方便，中文版文档 http://docs.jinkan.org/docs/jinja2/ 。
+后台可以直接搜索、删除DMCA投诉的关键字，管理首页推荐关键字、用户搜索记录、查看每天爬取的资源数量、管理后台用户。
+修改数据库密码后请修改manage.py里面的mysql+pymysql://root:后面的内容和simdht_work.py里面的DB_PASS
 实验环境：centos7 python2.7
 
 安装：
@@ -19,6 +16,37 @@ systemctl stop iptables.service
 systemctl disable iptables.service  
 setenforce 0  
 sed -i s/"SELINUX=enforcing"/"SELINUX=disabled"/g  /etc/sysconfig/selinux
+#关闭selinux
+cat << EOF > /etc/sysctl.conf
+net.ipv4.tcp_syn_retries = 1
+net.ipv4.tcp_synack_retries = 1
+net.ipv4.tcp_keepalive_time = 600
+net.ipv4.tcp_keepalive_probes = 3
+net.ipv4.tcp_keepalive_intvl =15
+net.ipv4.tcp_retries2 = 5
+net.ipv4.tcp_fin_timeout = 2
+net.ipv4.tcp_max_tw_buckets = 36000
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_max_orphans = 32768
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_syn_backlog = 16384
+net.ipv4.tcp_wmem = 8192 131072 16777216
+net.ipv4.tcp_rmem = 32768 131072 16777216
+net.ipv4.tcp_mem = 786432 1048576 1572864
+net.ipv4.ip_local_port_range = 1024 65000
+net.ipv4.ip_conntrack_max = 65536
+net.ipv4.netfilter.ip_conntrack_max=65536
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_established=180
+net.core.somaxconn = 16384
+net.core.netdev_max_backlog = 16384
+EOF
+/sbin/sysctl -p /etc/sysctl.conf
+/sbin/sysctl -w net.ipv4.route.flush=1
+echo ulimit -HSn 65536 >> /etc/rc.local
+echo ulimit -HSn 65536 >>/root/.bash_profile
+ulimit -HSn 65536
+#优化内核参数，优化打开文件数
 cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install epel-release python-pip redis
