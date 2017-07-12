@@ -12,6 +12,13 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='ciliss_apple.jpg') }}"/>
+<script type="text/javascript">
+                      document.getElementById("search").focus();
+                      document.forms[0].onsubmit = function (e) {
+                          e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
+                          var url = '/search/' + encodeURIComponent(query) ; window.location = url; return false;
+                       };
+</script>
 </head>
 <body>
 <div id="wrapper">
