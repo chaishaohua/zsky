@@ -80,7 +80,7 @@ class Search_Hash(db.Model,UserMixin):
     info_hash = db.Column(db.String(40),nullable=False,unique=True)
     category = db.Column(db.String(20),nullable=False)
     data_hash = db.Column(db.String(32),nullable=False)
-    name = db.Column(db.String(255),index=True,nullable=False)
+    name = db.Column(db.String(200),index=True,nullable=False)
     extension = db.Column(db.String(20),nullable=False)
     classified = db.Column(db.Boolean(),nullable=False)
     source_ip = db.Column(db.String(20))
