@@ -49,7 +49,7 @@ from metadata import save_metadata
 DB_NAME = 'zsky'
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
-DB_PASS = '123456'
+DB_PASS = ''
 BOOTSTRAP_NODES = (
     ("router.bittorrent.com", 6881),
     ("dht.transmissionbt.com", 6881),
