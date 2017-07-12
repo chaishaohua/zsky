@@ -1,9 +1,9 @@
 #encoding:utf-8
+#我本戏子2017.7
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-import re
 import time
 import os
 import datetime
@@ -29,10 +29,8 @@ import jieba
 # Initialize Flask and set some config values
 app = Flask(__name__)
 app.config['DEBUG']=True
-#用于生产环境请禁用DEBUG模式
 app.config['SECRET_KEY'] = 'super-secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@127.0.0.1:3306/zsky'
-#在root:后面修改数据库密码
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 manager = Manager(app)
@@ -59,12 +57,20 @@ cache.init_app(app)
 class LoginForm(FlaskForm):
     name=StringField('用户名',validators=[DataRequired(),Length(1,32)])
     password=PasswordField('密码',validators=[DataRequired(),Length(1,20)])
+    #rememberme = BooleanField('记住我')
+    #submit=SubmitField('登录')
+    #def validate_login(self, field):
+    #    user = self.get_user()
+    #    if user is None:
+    #        raise ValidationError('用户名错误！')
+    #    if not check_password_hash(user.password, self.password.data):
+    #        raise ValidationError('密码错误！')
     def get_user(self):
         return db.session.query(User).filter_by(name=self.name.data).first()
 
 
 class SearchForm(FlaskForm):
-    search = StringField(validators = [DataRequired(message= '请输入关键字'),Length(4,20)],render_kw={"placeholder":"世界那么大，我要去看看"})
+    search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"世界那么大，我要去看看"})
     submit = SubmitField('搜索')
 
 
@@ -85,10 +91,10 @@ class Search_Hash(db.Model,UserMixin):
     classified = db.Column(db.Boolean())
     source_ip = db.Column(db.String(20))
     tagged = db.Column(db.Boolean())
-    length = db.Column(db.Integer,nullable=False)
+    length = db.Column(db.Integer)
     create_time = db.Column(db.DateTime,default=datetime.datetime.now)
     last_seen = db.Column(db.DateTime,default=datetime.datetime.now)
-    requests = db.Column(db.Integer,nullable=False)
+    requests = db.Column(db.Integer)
     comment = db.Column(db.String(100))
     creator = db.Column(db.String(20))
 
@@ -114,7 +120,6 @@ class Search_Tags(db.Model):
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
     tag = db.Column(db.String(100),nullable=False)
 
-
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
@@ -133,7 +138,7 @@ class User(db.Model, UserMixin):
         return self.username
 
 def make_shell_context():
-    return dict(app=app,db=db,Search_Filelist=Search_Filelist,Search_Hash=Search_Hash,Search_Keywords=Search_Keywords,Search_Statusreport=Search_Statusreport,Search_Tags=Search_Tags,Top_Hash=Top_Hash,Top_Tag=Top_Tag,User=User)
+    return dict(app=app,db=db,Search_Filelist=Search_Filelist,Search_Hash=Search_Hash,Search_Keywords=Search_Keywords,Search_Statusreport=Search_Statusreport,Search_Tags=Search_Tags,User=User)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
@@ -144,12 +149,11 @@ def load_user(id):
 
 @app.route('/',methods=['GET','POST'])
 @cache.cached(timeout=60*60*24)
-#所有的cache.cached都是缓存时间，这里设置的24小时，可以自定义修改
 def index():
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
     if form.validate_on_submit():
-        return url_for('search_results', querys = form.search.data.encode('utf-8'))
+        return url_for('search_results', query = form.search.data)
     return render_template('index.html',form=form,keywords=keywords)
 
 
@@ -159,55 +163,34 @@ def make_cache_key(*args, **kwargs):
     return (path + args).encode('utf-8')
 
 @app.route('/search', methods = ['GET','POST'])
-@app.route('/search/<querys>/',methods=['GET','POST'])
-@cache.cached(timeout=60*60*12,key_prefix=make_cache_key)
-def search_results(querys):
-    u=Search_Tags(tag=querys)
+@app.route('/search/<query>/',methods=['GET','POST'])
+@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+def search_results(query):
+    u=Search_Tags(tag=query)
     db.session.add(u)
     db.session.commit()
-    query=querys.split(' ')
     page=request.args.get('page',1,type=int)
-    if len(query)>1:
-        pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query[0]),Search_Hash.name.contains(query[1]),Search_Hash.name.contains(query[-1])).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
-        hashs=pagination.items
-        tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-        form=SearchForm()
-        if form.validate_on_submit():
-            return url_for('search_results', querys = form.search.data.encode('utf-8'))
-        return render_template('list.html',form=form,query=querys,hashs=hashs,pagination=pagination,tags=tags)
-    else:
-        pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query[0])).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
-        hashs=pagination.items
-        tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-        form=SearchForm()
-        if form.validate_on_submit():
-            return url_for('search_results', querys = form.search.data.encode('utf-8'))
-        return render_template('list.html',form=form,query=querys,hashs=hashs,pagination=pagination,tags=tags)
+    pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
+    hashs=pagination.items
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    form=SearchForm()
+    if form.validate_on_submit():
+        return url_for('search_results', query = form.search.data)
+    return render_template('list.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
 
 
 @app.route('/search', methods = ['GET','POST'])
-@app.route('/search/<querys>/bylength',methods=['GET','POST'])
-@cache.cached(timeout=60*60*12,key_prefix=make_cache_key)
-def search_results_bylength(querys):
-    query=querys.split(' ')
+@app.route('/search/<query>/bylength',methods=['GET','POST'])
+@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
-    if len(query)>1:
-        pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query[0]),Search_Hash.name.contains(query[1]),Search_Hash.name.contains(query[-1])).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
-        hashs=pagination.items
-        tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-        form=SearchForm()
-        if form.validate_on_submit():
-            return url_for('search_results', querys = form.search.data.encode('utf-8'))
-        return render_template('list_bylength.html',form=form,query=querys,hashs=hashs,pagination=pagination,tags=tags)
-    else:
-        pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query[0])).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
-        hashs=pagination.items
-        tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-        form=SearchForm()
-        if form.validate_on_submit():
-            return url_for('search_results', querys = form.search.data.encode('utf-8'))
-        return render_template('list_bylength.html',form=form,query=querys,hashs=hashs,pagination=pagination,tags=tags)
-
+    pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
+    hashs=pagination.items
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    form=SearchForm()
+    if form.validate_on_submit():
+        return url_for('search_results', query = form.search.data)
+    return render_template('list_bylength.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
 
 
 @app.route('/detail/<info_hash>.html',methods=['GET','POST'])
@@ -218,7 +201,7 @@ def detail(info_hash):
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
     if form.validate_on_submit():
-        return url_for('search_results', query = form.search.data.encode('utf-8'))
+        return url_for('search_results', query = form.search.data)
     return render_template('detail.html',form=form,hash=hash,fenci_list=fenci_list)
 
 
