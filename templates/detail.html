@@ -9,6 +9,13 @@
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
 <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<script type="text/javascript">
+                      document.getElementById("search").focus();
+                      document.forms[0].onsubmit = function (e) {
+                          e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
+                          var url = '/search/' + encodeURIComponent(query) ; window.location = url; return false;
+                       };
+</script>
 </head>
 <body>
 <div id="wrapper">
