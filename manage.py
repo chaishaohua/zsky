@@ -89,7 +89,7 @@ class Search_Hash(db.Model,UserMixin):
     create_time = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
     last_seen = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
     requests = db.Column(db.Integer,nullable=False)
-    comment = db.Column(db.String(255))
+    comment = db.Column(db.String(100))
     creator = db.Column(db.String(20))
 
 class Search_Keywords(db.Model):
