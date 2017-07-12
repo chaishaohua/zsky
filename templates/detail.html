@@ -9,13 +9,6 @@
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
 <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
-<script type="text/javascript">
-                      document.getElementById("search").focus();
-                      document.forms[0].onsubmit = function (e) {
-                          e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                          var url = '/search/' + encodeURIComponent(query) ; window.location = url; return false;
-                       };
-</script>
 </head>
 <body>
 <div id="wrapper">
@@ -37,7 +30,13 @@
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-
+<script type="text/javascript">
+                     document.getElementById("search").focus();
+                     document.forms[0].onsubmit = function (e) {
+                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
+                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
+                     };
+				</script>
 </div>
 
 <div id="content">
@@ -75,7 +74,7 @@
 <div class="panel-header">你可能喜欢</div>
 <div class="panel-body">
 {%for fenci in fenci_list%}
-<a href="{{url_for('search_results',querys=fenci)}}">{{fenci}}</a>&nbsp;&nbsp;
+<a href="{{url_for('search_results',query=fenci)}}">{{fenci}}</a>&nbsp;&nbsp;
 {%endfor%}
 </div>
 </div>
