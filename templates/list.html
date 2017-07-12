@@ -3,19 +3,12 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>{{query}} - 搜索结果 - 纸上烤鱼,磁力链接,磁力搜索</title>
+<title>{{query}} - 搜索结果 - 纸上烤鱼磁力链接,磁力搜索</title>
 <meta name="keywords" content=""/>
 <meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
 <meta name="viewport" content="width=device-width"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
 <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
-  <script type="text/javascript">
-                      document.getElementById("search").focus();
-                      document.forms[0].onsubmit = function (e) {
-                          e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                          var url = '/search/' + encodeURIComponent(query) ; window.location = url; return false;
-                       };
-</script>
 </head>
 <body>
 <div id="wrapper">
@@ -37,7 +30,13 @@
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-
+<script type="text/javascript">
+                     document.getElementById("search").focus();
+                     document.forms[0].onsubmit = function (e) {
+                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
+                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
+                     };
+				</script>
 </div>
 <div id="sort-bar">
 <a href="#"><b>创建时间</b></a>
@@ -67,16 +66,16 @@
 {%endif%}</span>
 <span>热度：<b>{{hash.requests}}</b></span>
 <span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash.info_hash | upper}}" >磁力链接</a></span>
-
+<a href="magnet:?xt=urn:btih:{{hash.info_hash|upper}}" class="download">磁力链接</a> 
 </div>
 </div>
 {% endfor %} 
 <div class="bottom-pager detail-width">
-<a href="{% if pagination.has_prev %}{{url_for('search_results',querys=query,page=pagination.page-1)}}{% else %}#{% endif %}" >&lt;&lt;</a> 
+<a href="{% if pagination.has_prev %}{{url_for('search_results',query=query,page=pagination.page-1)}}{% else %}#{% endif %}" >&lt;&lt;</a> 
   {% for page in pagination.iter_pages() %}
     {% if page %}
       {% if page != pagination.page %}
-        <a href="{{ url_for('search_results', querys=query,page=page) }}">{{ page }}</a>
+        <a href="{{ url_for('search_results', query=query,page=page) }}">{{ page }}</a>
       {% else %}
         <span>{{ page }}</span>
       {% endif %}
@@ -84,7 +83,7 @@
       …
     {% endif %}
   {% endfor %}  
-<a href="{%if pagination.has_next %}{{url_for('search_results',querys=query,page=pagination.page+1)}}{% else %}#{% endif %}" >&gt;&gt;</a>
+<a href="{%if pagination.has_next %}{{url_for('search_results',query=query,page=pagination.page+1)}}{% else %}#{% endif %}" >&gt;&gt;</a>
 
 </div>
 </div>
