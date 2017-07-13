@@ -24,19 +24,13 @@
 </select>
 </div>
 <div class="header-div">
-<form class="search-form"  action="{{url_for('search_results')}}" method="get">
+<form class="search-form"  action="{{url_for('search')}}" method="POST">
 <a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-<script type="text/javascript">
-                     document.getElementById("search").focus();
-                     document.forms[0].onsubmit = function (e) {
-                        e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                        var url = '/search/' + encodeURIComponent(query) + ''; window.location = url; return false;
-                     };
-				</script>
+
 </div>
 <div id="sort-bar">
 <a href="#"><b>创建时间</b></a>
@@ -52,7 +46,7 @@
 {% for hash in hashs %}  
 <div class="search-item detail-width">
 <div class="item-title">
-<h3><a title="{{ hash.name }}" href="{{url_for('detail',info_hash=hash.info_hash)}}" target="_blank">{{ hash.name }}</a></h3>
+<h3><a title="{{ hash.name }}" href="{{url_for('detail',id=hash.id)}}" target="_blank">{{ hash.name }}</a></h3>
 </div>
 <div class="item-list">
 </div>
