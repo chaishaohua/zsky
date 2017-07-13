@@ -24,12 +24,15 @@ from getpass import getpass
 from flask_cache import Cache
 from werkzeug.security import generate_password_hash,check_password_hash
 import jieba
-
+#from flask_debugtoolbar import DebugToolbarExtension
 
 # Initialize Flask and set some config values
 app = Flask(__name__)
 app.config['DEBUG']=True
 app.config['SECRET_KEY'] = 'super-secret'
+#debug_toolbar=DebugToolbarExtension()
+#debug_toolbar.init_app(app)
+#app.config['DEBUG_TB_INTERCEPT_REDIRECTS']=False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@127.0.0.1:3306/zsky'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
@@ -85,16 +88,16 @@ class Search_Hash(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
     info_hash = db.Column(db.String(40),nullable=False,unique=True)
     category = db.Column(db.String(20),nullable=False)
-    data_hash = db.Column(db.String(32))
+    data_hash = db.Column(db.String(32),nullable=False)
     name = db.Column(db.String(200),index=True,nullable=False)
-    extension = db.Column(db.String(20))
-    classified = db.Column(db.Boolean())
+    extension = db.Column(db.String(20),nullable=False)
+    classified = db.Column(db.Boolean(),nullable=False)
     source_ip = db.Column(db.String(20))
-    tagged = db.Column(db.Boolean())
-    length = db.Column(db.Integer)
-    create_time = db.Column(db.DateTime,default=datetime.datetime.now)
-    last_seen = db.Column(db.DateTime,default=datetime.datetime.now)
-    requests = db.Column(db.Integer)
+    tagged = db.Column(db.Boolean(),nullable=False)
+    length = db.Column(db.Integer,nullable=False)
+    create_time = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
+    last_seen = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
+    requests = db.Column(db.Integer,nullable=False)
     comment = db.Column(db.String(100))
     creator = db.Column(db.String(20))
 
@@ -148,12 +151,12 @@ def load_user(id):
 
 
 @app.route('/',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24)
+#@cache.cached(timeout=60)
 def index():
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
-    if form.validate_on_submit():
-        return url_for('search_results', query = form.search.data)
+ #   if form.validate_on_submit():
+ #       return redirect(url_for('search_results'))
     return render_template('index.html',form=form,keywords=keywords)
 
 
@@ -162,46 +165,49 @@ def make_cache_key(*args, **kwargs):
     args = str(hash(frozenset(request.args.items())))
     return (path + args).encode('utf-8')
 
-@app.route('/search', methods = ['GET','POST'])
-@app.route('/search/<query>/',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+@app.route('/search',methods=['GET','POST'])
+def search():
+    form=SearchForm()
+    return redirect(url_for('search_results',query=form.search.data))
+
+@app.route('/main-search-kw-<query>-px-1.html',methods=['GET','POST'])
+#@cache.cached(timeout=60,key_prefix=make_cache_key)
 def search_results(query):
     u=Search_Tags(tag=query)
     db.session.add(u)
     db.session.commit()
     page=request.args.get('page',1,type=int)
-    pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
+    pagination = db.session.query(Search_Hash.id,Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
     hashs=pagination.items
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
-    if form.validate_on_submit():
-        return url_for('search_results', query = form.search.data)
+ #   if form.validate_on_submit():
+ #       return redirect(url_for('search_results', query = form.search.data))
     return render_template('list.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
 
 
-@app.route('/search', methods = ['GET','POST'])
-@app.route('/search/<query>/bylength',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24,key_prefix=make_cache_key)
+@app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
+#@cache.cached(timeout=60,key_prefix=make_cache_key)
 def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
-    pagination = db.session.query(Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
+    pagination = db.session.query(Search_Hash.id,Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
     hashs=pagination.items
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
-    if form.validate_on_submit():
-        return url_for('search_results', query = form.search.data)
+  #  if form.validate_on_submit():
+  #      return redirect(url_for('search_results', query = form.search.data))
     return render_template('list_bylength.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
 
 
-@app.route('/detail/<info_hash>.html',methods=['GET','POST'])
-@cache.cached(timeout=60*60*24)
-def detail(info_hash):
-    hash=Search_Hash.query.filter_by(info_hash=info_hash).first()
+@app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
+#@cache.cached(timeout=60)
+def detail(id):
+    hash=Search_Hash.query.filter_by(id=id).first()
     fenci_list=jieba.cut(hash.name, cut_all=False)
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
-    if form.validate_on_submit():
-        return url_for('search_results', query = form.search.data)
+  #  if form.validate_on_submit():
+  #      return redirect(url_for('search_results', query = form.search.data))
     return render_template('detail.html',form=form,hash=hash,fenci_list=fenci_list)
 
 
