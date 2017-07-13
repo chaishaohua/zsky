@@ -12,6 +12,7 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='ciliss_apple.jpg') }}"/>
+
 </head>
 <body>
 <div id="wrapper">
@@ -34,7 +35,7 @@
 <p><h1>纸上烤鱼-最快的磁力链接搜索引擎</h1></p>
 </div>
 <div id="search-box">
-<form id="search-form" action="{{url_for('search_results')}}" method="get">
+<form id="search-form" action="{{url_for('search')}}" method="POST">
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
@@ -47,13 +48,6 @@
 </ul>
 </div>
 </div>
-<script type="text/javascript">
-                      document.getElementById("search").focus();
-                      document.forms[0].onsubmit = function (e) {
-                          e.preventDefault(); var query = document.getElementById("search").value; if (!query) { document.getElementById("search").focus(); return false; }
-                          var url = '/search/' + encodeURIComponent(query) ; window.location = url; return false;
-                       };
-						</script>
 </div>
 </div>
 </div>
