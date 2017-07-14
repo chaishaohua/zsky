@@ -16,7 +16,7 @@
 </head>
 <body>
 <div id="wrapper">
-<div class="top-bar">﻿ <span class="first"><a href="/">种子搜索</a></span>
+<div class="top-bar">﻿<span class="first"><a href="/">种子搜索</a></span>
 <span class="second"><a href="/tags">种子大全</a></span>
 <span class="second"><a href="/top">排行</a></span>
 <select autocomplete="off" onchange="changeLanguage(this.value)">
@@ -43,7 +43,7 @@
 <div class="info-box">
 <ul>
 {%for k in keywords%}
-<li><a href="/search/{{k.keyword}}">{{k.keyword}}</a></li>
+<li><a href="{{url_for('search_results',query=k.keyword)}}">{{k.keyword}}</a></li>
 {%endfor%}
 </ul>
 </div>
