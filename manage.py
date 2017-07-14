@@ -24,6 +24,7 @@ from getpass import getpass
 from flask_cache import Cache
 from werkzeug.security import generate_password_hash,check_password_hash
 import jieba
+import pymysql
 #from flask_debugtoolbar import DebugToolbarExtension
 
 # Initialize Flask and set some config values
@@ -38,7 +39,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 manager = Manager(app)
 migrate = Migrate(app, db)
-Moment(app)
+moment=Moment(app)
 babel = Babel(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 loginmanager=LoginManager()
@@ -86,18 +87,18 @@ class Search_Filelist(db.Model):
 class Search_Hash(db.Model,UserMixin):
     __tablename__ = 'search_hash'
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    info_hash = db.Column(db.String(40),nullable=False,unique=True)
-    category = db.Column(db.String(20),nullable=False)
-    data_hash = db.Column(db.String(32),nullable=False)
-    name = db.Column(db.String(200),index=True,nullable=False)
-    extension = db.Column(db.String(20),nullable=False)
-    classified = db.Column(db.Boolean(),nullable=False)
+    info_hash = db.Column(db.String(40),unique=True)
+    category = db.Column(db.String(20))
+    data_hash = db.Column(db.String(32))
+    name = db.Column(db.String(200),index=True)
+    extension = db.Column(db.String(20))
+    classified = db.Column(db.Boolean())
     source_ip = db.Column(db.String(20))
-    tagged = db.Column(db.Boolean(),nullable=False)
-    length = db.Column(db.Integer,nullable=False)
-    create_time = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
-    last_seen = db.Column(db.DateTime,default=datetime.datetime.now,nullable=False)
-    requests = db.Column(db.Integer,nullable=False)
+    tagged = db.Column(db.Boolean(),default=False)
+    length = db.Column(db.Integer)
+    create_time = db.Column(db.DateTime,default=datetime.datetime.now)
+    last_seen = db.Column(db.DateTime,default=datetime.datetime.now)
+    requests = db.Column(db.Integer)
     comment = db.Column(db.String(100))
     creator = db.Column(db.String(20))
 
@@ -140,10 +141,6 @@ class User(db.Model, UserMixin):
     def __unicode__(self):
         return self.username
 
-def make_shell_context():
-    return dict(app=app,db=db,Search_Filelist=Search_Filelist,Search_Hash=Search_Hash,Search_Keywords=Search_Keywords,Search_Statusreport=Search_Statusreport,Search_Tags=Search_Tags,User=User)
-manager.add_command("shell", Shell(make_context=make_shell_context))
-manager.add_command('db', MigrateCommand)
 
 @loginmanager.user_loader
 def load_user(id):
@@ -155,8 +152,6 @@ def load_user(id):
 def index():
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
- #   if form.validate_on_submit():
- #       return redirect(url_for('search_results'))
     return render_template('index.html',form=form,keywords=keywords)
 
 
@@ -165,39 +160,63 @@ def make_cache_key(*args, **kwargs):
     args = str(hash(frozenset(request.args.items())))
     return (path + args).encode('utf-8')
 
+def todate_filter(s):
+    return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
+app.add_template_filter(todate_filter,'todate')
+
 @app.route('/search',methods=['GET','POST'])
 def search():
     form=SearchForm()
     return redirect(url_for('search_results',query=form.search.data))
 
-@app.route('/main-search-kw-<query>-px-1.html',methods=['GET','POST'])
+@app.route('/main-search.html-kw-<query>/',methods=['GET','POST'])
 #@cache.cached(timeout=60,key_prefix=make_cache_key)
-def search_results(query):
+def search_results(query=None):
     u=Search_Tags(tag=query)
     db.session.add(u)
     db.session.commit()
     page=request.args.get('page',1,type=int)
-    pagination = db.session.query(Search_Hash.id,Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.create_time.desc()).paginate(page,per_page=10,error_out=False)
-    hashs=pagination.items
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
- #   if form.validate_on_submit():
- #       return redirect(url_for('search_results', query = form.search.data))
-    return render_template('list.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
+    return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 
 @app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
 #@cache.cached(timeout=60,key_prefix=make_cache_key)
 def search_results_bylength(query):
+    u=Search_Tags(tag=query)
+    db.session.add(u)
+    db.session.commit()
     page=request.args.get('page',1,type=int)
-    pagination = db.session.query(Search_Hash.id,Search_Hash.name,Search_Hash.info_hash,Search_Hash.category,Search_Hash.length,Search_Hash.create_time,Search_Hash.requests).filter(Search_Hash.name.contains(query)).order_by(Search_Hash.length.desc()).paginate(page,per_page=10,error_out=False)
-    hashs=pagination.items
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
-  #  if form.validate_on_submit():
-  #      return redirect(url_for('search_results', query = form.search.data))
-    return render_template('list_bylength.html',form=form,query=query,hashs=hashs,pagination=pagination,tags=tags)
-
+    return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
 #@cache.cached(timeout=60)
@@ -206,8 +225,6 @@ def detail(id):
     fenci_list=jieba.cut(hash.name, cut_all=False)
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
-  #  if form.validate_on_submit():
-  #      return redirect(url_for('search_results', query = form.search.data))
     return render_template('detail.html',form=form,hash=hash,fenci_list=fenci_list)
 
 
