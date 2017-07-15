@@ -77,12 +77,17 @@ class SearchForm(FlaskForm):
     search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"世界那么大，我要去看看"})
     submit = SubmitField('搜索')
 
-
 class Search_Filelist(db.Model):
     """ 这个表可以定期删除 """
     __tablename__ = 'search_filelist'
     info_hash = db.Column(db.String(40), primary_key=True,nullable=False)
     file_list = db.Column(db.Text,nullable=False)
+
+class Sphinx_Counter(db.Model):
+    """ 索引记录 """
+    __tablename__ = 'sphinx_counter'
+    counter_id = id = db.Column(db.Integer,primary_key=True)
+    max_doc_id = id = db.Column(db.Integer)
 
 class Search_Hash(db.Model,UserMixin):
     __tablename__ = 'search_hash'
