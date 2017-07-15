@@ -62,8 +62,8 @@ python manage.py create_user
 #按照提示输入用户名、密码、邮箱
 #设置nginx为前端
 yum -y install nginx
-ps ef|grep httpd|awk '{print $2}'|grep -v grep|xargs kill -9
-#杀死Apache
+kill -9 $(lsof -i:80|tail -1|awk '"$1"!=""{print $2}')
+#杀死占用80端口的进程
 systemctl start  nginx.service
 systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
