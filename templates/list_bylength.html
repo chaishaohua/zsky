@@ -50,7 +50,7 @@
 </div>
 <div class="item-bar">
 <span class="cpill fileType1">{{hash['category']}}</span>
-<span>创建时间：<b>{{hash['create_time']}}</b></span>
+<span>创建时间：<b>{{ hash['create_time']|todate }}</b></span>
 <span>文件大小：<b>
 {% if hash['length']>1073741824 %}
 <b class="cpill yellow-pill">{{(hash['length']/1073741824)|round(2)}}G</b>
