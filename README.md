@@ -1,5 +1,7 @@
 使用说明
 
+yum -y install git 
+
 git  clone https://github.com/wenguonideshou/zsky.git
 
 cd zsky
