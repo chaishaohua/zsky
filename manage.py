@@ -86,8 +86,8 @@ class Search_Filelist(db.Model):
 class Sphinx_Counter(db.Model):
     """ 索引记录 """
     __tablename__ = 'sphinx_counter'
-    counter_id = id = db.Column(db.Integer,primary_key=True)
-    max_doc_id = id = db.Column(db.Integer)
+    counter_id  = db.Column(db.Integer,primary_key=True)
+    max_doc_id  = db.Column(db.Integer)
 
 class Search_Hash(db.Model,UserMixin):
     __tablename__ = 'search_hash'
