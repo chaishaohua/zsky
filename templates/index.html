@@ -1,21 +1,22 @@
-
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="baidu-site-verification" content="P1QzNDXk6x"/>
 <meta charset="utf-8"/>
-<title>{{query}} - 搜索结果 - 纸上烤鱼磁力链接,磁力搜索</title>
+<title>纸上烤鱼 - 种子搜索网站,最快的磁力链接搜索引擎,BTrabbit</title>
 <meta name="keywords" content=""/>
-<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
-<meta name="viewport" content="width=device-width"/>
+<meta name="description" content="纸上烤鱼种子搜索神器,一个有兔子般速度的种子搜索网站,为您提供高效精准的磁力链接搜索服务!"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<script src="https://cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.18.1/moment.js"></script>
-<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
-<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='ciliss_apple.jpg') }}"/>
+
 </head>
 <body>
 <div id="wrapper">
-<div class="top-bar">﻿ <span class="first"><a href="/">种子搜索</a></span>
+<div class="top-bar"><span class="first"><a href="/">种子搜索</a></span>
 <select autocomplete="off" onchange="changeLanguage(this.value)">
 <option value="KR">한국어</option>
 <option value="EN">English</option>
@@ -24,79 +25,31 @@
 <option value="HK">繁體中文</option>
 </select>
 </div>
-<div class="header-div">
-<form class="search-form"  action="{{url_for('search')}}" method="POST">
-<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
+<div id="first-content">
+<div id="center-box-wrapper">
+<div id="center-box">
+<div id="center-logo">
+<a href="/"><img src="{{ url_for('static', filename='logo.png') }}" alt="纸上烤鱼"/></a>
+<p><h1>纸上烤鱼-最快的磁力链接搜索引擎</h1></p>
+</div>
+<div id="search-box">
+<form id="search-form" action="{{url_for('search')}}" method="POST">
 {{form.hidden_tag()}}
 {{form.search(id="search")}}
 {{form.submit(class="blue",id="btnSearch")}}
 </form>
-
-</div>
-<div id="sort-bar">
-<a href="#"><b>创建时间</b></a>
-<a href="{{url_for('search_results_bylength',query=query)}}">文件大小</a>
-</div>
-<div id="content">
-<div id="wall">
-<div class="search-statu">
-<span>共找到 {{counts}} 条关于 {{query}} 的结果</span>
-</div>
-<div class="adsense" style="position:relative"></div>
-<div class="col-md-8">
-{% for hash in hashs %}  
-<div class="search-item detail-width">
-<div class="item-title">
-<h3><a title="{{ hash.name }}" href="{{url_for('detail',id=hash.id)}}" target="_blank">{{ hash.name }}</a></h3>
-</div>
-<div class="item-list">
-</div>
-<div class="item-bar">
-<span class="cpill fileType1">{{hash['category']}}</span>
-<span>创建时间：<b>{{ hash['create_time']|todate }}</b></span>
-<span>文件大小：<b>
-{% if hash['length']>1073741824 %}
-<b class="cpill yellow-pill">{{(hash['length']/1073741824)|round(2)}}G</b>
-{% else %}<b class="cpill blue-pill">{{(hash['length']/1048576)|round(2)}}M</b>
-{%endif%}</span>
-<span>热度：<b></b></span>
-<span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" >磁力链接</a></span>
-</div>
-</div>
-{% endfor %} 
-<div class="bottom-pager detail-width">
-{% set prev_pages = page-4 if page>5 else 1 %}
-{% set next_pages = page+5 if page+5<=pages else pages%}
-{%if pages<10%}
-{%for i in range(1,pages+1)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
+<div class="info-box">
+<ul>
+{%for k in keywords%}
+<li><a href="{{url_for('search_results',query=k.keyword)}}">{{k.keyword}}</a></li>
 {%endfor%}
-{%else%}
-{%for i in range(prev_pages,page)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
-{%endfor%}
-<span>{{page}}</span>
-{%for i in range(page+1,next_pages+1)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
-{%endfor%}
-{%endif%}
-
-
-</div>
-</div>
-<div class="col-md-2">
-<div class="search-notice sidebar-width">电影磁力链接,电影bt种子下载,电影迅雷下载相关资源由用户搜索指令自动获取，结果来源于网络，本站不存储任何资料，亦不承担任何责任，请于24小时内删除！</div>
-<div id="latest-search" class="sidebar-width">
-<span class="latest-desc">大家对这些感兴趣：</span>
-{%for tag in tags%}
-<span><a href="{{url_for('search_results',query=tag.tag)}}">{{tag.tag}}</a></span>
-{%endfor%}
+</ul>
 </div>
 </div>
 </div>
 </div>
-<div class="push">
 </div>
+<div class="push"></div>
 </div>
 <div class="footer">
 <span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
@@ -107,3 +60,4 @@
        </script>
 </body>
 </html>
+
