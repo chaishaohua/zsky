@@ -12,7 +12,7 @@
 </head>
 <body>
 <div id="wrapper">
-<div class="top-bar">﻿ <span class="first"><a href="/">种子搜索</a></span>
+<div class="top-bar"><span class="first"><a href="/">种子搜索</a></span>
 <select autocomplete="off" onchange="changeLanguage(this.value)">
 <option value="KR">한국어</option>
 <option value="EN">English</option>
@@ -31,8 +31,8 @@
 
 </div>
 <div id="sort-bar">
-<a href="#"><b>创建时间</b></a>
-<a href="{{url_for('search_results_bylength',query=query)}}">文件大小</a>
+<a href="#">文件大小</a>
+<a href="{{url_for('search_results',query=query)}}"><b>创建时间</b></a>
 </div>
 <div id="content">
 <div id="wall">
