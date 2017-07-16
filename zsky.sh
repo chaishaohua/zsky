@@ -1,6 +1,5 @@
 #!/bin/sh
 #By 我本戏子 2017.7
-
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
 systemctl stop iptables.service  
@@ -30,25 +29,24 @@ net.ipv4.netfilter.ip_conntrack_max=65536
 net.ipv4.netfilter.ip_conntrack_tcp_timeout_established=180
 net.core.somaxconn = 16384
 net.core.netdev_max_backlog = 16384
+vm.overcommit_memory = 1
 EOF
 /sbin/sysctl -p /etc/sysctl.conf
 /sbin/sysctl -w net.ipv4.route.flush=1
 echo ulimit -HSn 65536 >> /etc/rc.local
 echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
-#优化内核参数，优化打开文件数
 yum -y install git 
-#如果使用linode主机，请取消下面4行的注释
-#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyuncs.com/repo/Centos-7.repo
+#如果使用linode主机,请取消下面4行的注释
+#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 #wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 #yum clean metadata
 #yum makecache
 cd /root/
 git  clone https://github.com/wenguonideshou/zsky.git
 cd zsky
-#源码在/root/zsky目录
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
-yum -y install epel-release python-pip redis psmisc
+yum -y install epel-release python-pip redis psmisc net-tools
 pip install -r requirements.txt
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
@@ -59,21 +57,21 @@ mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout
 python manage.py init_db
 #建表
 python manage.py create_user
-#按照提示输入用户名、密码、邮箱
-#设置nginx为前端
-yum -y install nginx
+#按照提示输入管理员用户名、密码、邮箱
 kill -9 $(lsof -i:80|tail -1|awk '"$1"!=""{print $2}')
 #杀死占用80端口的进程
+yum -y install nginx
 systemctl start  nginx.service
 systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
 #启动gunicorn并在后台运行
-nohup gunicorn -k gevent manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&  
+nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&  
 #运行爬虫并在后台运行
 nohup python simdht_worker.py >/dev/zero 2>&1& 
-#整合sphinx+jieba
+supervisord -c /root/zsky/zskysuper.conf
+supervisorctl -c /root/zsky/zskysuper.conf
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
@@ -101,11 +99,10 @@ echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
 echo "nohup gunicorn -k gevent manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf --all" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
-#设置计划任务,每30分钟进行增量索引并合并索引,每天早上1:30进行主索引
+#设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
 systemctl enable crond.service
 crontab -l > /tmp/crontab.bak
-echo '*/30 * * * * /usr/local/sphinx-jieba/bin/indexer -c ~/zsky/sphinx.conf delta --rotate&&/usr/local/sphinx-jieba/bin/indexer -c ~/zsky/sphinx.conf --merge film delta --rotate >/dev/null 2>&1' >> /tmp/crontab.bak
-echo '30 1 * * * /usr/local/sphinx-jieba/bin/indexer -c ~/zsky/sphinx.conf all --rotate&&usr/local/sphinx-jieba/bin/searchd --config ~/zsky/sphinx.conf >/dev/null 2>&1' >> /tmp/crontab.bak
+echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf --all --rotate&&/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf' >> /tmp/crontab.bak
 crontab /tmp/crontab.bak
