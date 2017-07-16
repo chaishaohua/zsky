@@ -173,6 +173,8 @@ app.add_template_filter(todate_filter,'todate')
 @app.route('/search',methods=['GET','POST'])
 def search():
     form=SearchForm()
+    if not form.search.data:
+        return redirect(url_for('index'))
     return redirect(url_for('search_results',query=form.search.data))
 
 @app.route('/main-search.html-kw-<query>/',methods=['GET','POST'])
