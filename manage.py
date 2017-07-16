@@ -36,6 +36,7 @@ app.config['SECRET_KEY'] = 'super-secret'
 #app.config['DEBUG_TB_INTERCEPT_REDIRECTS']=False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@127.0.0.1:3306/zsky'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_POOL_SIZE']=5000
 db = SQLAlchemy(app)
 manager = Manager(app)
 migrate = Migrate(app, db)
