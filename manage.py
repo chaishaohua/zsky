@@ -199,6 +199,7 @@ def search_results(query=None):
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
+	form.search.data=query
     return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 
@@ -224,6 +225,7 @@ def search_results_bylength(query):
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
+	form.search.data=query
     return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
