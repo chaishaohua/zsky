@@ -68,8 +68,8 @@ systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
-#启动gunicorn并在后台运行
-nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&  
+#启动gunicorn开启日志并在后台运行
+nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&  
 #运行爬虫并在后台运行
 nohup python simdht_worker.py >/dev/zero 2>&1& 
 supervisord -c /root/zsky/zskysuper.conf
@@ -99,7 +99,7 @@ echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
 echo "cd /root/zsky/" >> /etc/rc.d/rc.local
 echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
-echo "nohup gunicorn -k gevent manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
+echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf --all" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
