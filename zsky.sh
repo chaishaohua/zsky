@@ -30,6 +30,7 @@ net.ipv4.netfilter.ip_conntrack_tcp_timeout_established=180
 net.core.somaxconn = 16384
 net.core.netdev_max_backlog = 16384
 vm.overcommit_memory = 1
+net.core.somaxconn = 511
 EOF
 /sbin/sysctl -p /etc/sysctl.conf
 /sbin/sysctl -w net.ipv4.route.flush=1
@@ -37,17 +38,18 @@ echo ulimit -HSn 65536 >> /etc/rc.local
 echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
 yum -y install git 
-#如果使用linode主机,请取消下面4行的注释
-#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-#wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-#yum clean metadata
-#yum makecache
 cd /root/
 git  clone https://github.com/wenguonideshou/zsky.git
 cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
-yum -y install epel-release python-pip redis psmisc net-tools
+yum -y install redis psmisc net-tools lsof
+yum -y install epel-release python-pip
 pip install -r requirements.txt
+#如果提示没有pip命令,请取消下面4行的注释
+#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+#wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+#yum clean metadata
+#yum makecache
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
 systemctl start redis.service
@@ -71,7 +73,8 @@ nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log 
 #运行爬虫并在后台运行
 nohup python simdht_worker.py >/dev/zero 2>&1& 
 supervisord -c /root/zsky/zskysuper.conf
-supervisorctl -c /root/zsky/zskysuper.conf
+echo '当前进程运行状态:'
+supervisorctl -c /root/zsky/zskysuper.conf status
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
@@ -99,6 +102,8 @@ echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
 echo "nohup gunicorn -k gevent manage:app -b 127.0.0.1:8000 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf --all" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
+echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
