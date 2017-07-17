@@ -21,7 +21,7 @@ from flask_babelex import Babel
 from flask_admin import helpers, AdminIndexView, Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
 from getpass import getpass
-from flask_cache import Cache
+from flask_caching import Cache
 from werkzeug.security import generate_password_hash,check_password_hash
 import jieba
 import pymysql
