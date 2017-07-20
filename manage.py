@@ -101,7 +101,7 @@ class Search_Hash(db.Model,UserMixin):
     classified = db.Column(db.Boolean())
     source_ip = db.Column(db.String(20))
     tagged = db.Column(db.Boolean(),default=False)
-    length = db.Column(db.BIGINT)
+    length = db.Column(db.BigInteger)
     create_time = db.Column(db.DateTime,default=datetime.datetime.now)
     last_seen = db.Column(db.DateTime,default=datetime.datetime.now)
     requests = db.Column(db.Integer)
