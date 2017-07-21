@@ -295,7 +295,7 @@ class TagsView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('.login_view'))
 
 class UserView(ModelView):
     #column_exclude_list = 'password'
