@@ -282,7 +282,7 @@ class HashView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('.login_view'))
 
 
 class TagsView(ModelView):
@@ -307,7 +307,7 @@ class UserView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('.login_view'))
 
 admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),base_template='admin/my_master.html')
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
