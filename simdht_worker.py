@@ -328,7 +328,7 @@ class Master(Thread):
 
             utcnow = datetime.datetime.utcnow()
             date = (utcnow + datetime.timedelta(hours=8))
-            date = datetime.datetime(date.year, date.month, date.day)
+            date = datetime.datetime(date.year, date.month, date.day ,date.hour ,date.minute ,date.second)
 
             # Check if we have this info_hash
             self.dbcurr.execute('SELECT id FROM search_hash WHERE info_hash=%s', (info_hash,))
