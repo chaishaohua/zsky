@@ -111,4 +111,6 @@ crontab -l > /tmp/crontab.bak
 echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate&&/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf' >> /tmp/crontab.bak
 crontab /tmp/crontab.bak
 echo '当前进程运行状态:'
-supervisorctl -c /root/zsky/zskysuper.conf status
+pgrep -l searchd
+pgrep -l gunicorn
+pgrep -l nginx
