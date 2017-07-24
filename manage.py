@@ -128,7 +128,7 @@ class Search_Tags(db.Model):
     """ 搜索记录 """
     __tablename__ = 'search_tags'
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    tag = db.Column(db.String(100),nullable=False)
+    tag = db.Column(db.String(100),nullable=False,unique=True)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -180,9 +180,13 @@ def search():
 @app.route('/main-search.html-kw-<query>/',methods=['GET','POST'])
 #@cache.cached(timeout=60,key_prefix=make_cache_key)
 def search_results(query=None):
-    u=Search_Tags(tag=query)
-    db.session.add(u)
-    db.session.commit()
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
@@ -206,9 +210,13 @@ def search_results(query=None):
 @app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
 #@cache.cached(timeout=60,key_prefix=make_cache_key)
 def search_results_bylength(query):
-    u=Search_Tags(tag=query)
-    db.session.add(u)
-    db.session.commit()
+    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
