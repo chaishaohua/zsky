@@ -1,5 +1,6 @@
 #!/bin/sh
 #By 我本戏子 2017.7
+#1.1 解决部分主机无法安装pip和redis的问题
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
 systemctl stop iptables.service  
@@ -46,7 +47,7 @@ yum -y install psmisc net-tools lsof epel-release
 yum -y install python-pip
 yum -y install redis
 pip install -r requirements.txt
-#如果你使用linode的主机,请取消下面4行的注释
+#如果提示没有pip命令,或者你使用linode的主机,请取消下面4行的注释
 #wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 #wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 #yum clean metadata
@@ -55,24 +56,28 @@ systemctl start  mariadb.service
 systemctl enable mariadb.service
 systemctl start redis.service
 systemctl enable redis.service
-mysql -uroot  -e"create database zsky default character set utf8;"  
+mysql -uroot  -e"create database zsky default character set utf8mb4;"  
 mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 10000;" 
-python manage.py init_db
 #建表
-python manage.py create_user
+python manage.py init_db
 #按照提示输入管理员用户名、密码、邮箱
-kill -9 $(lsof -i:80|tail -1|awk '"$1"!=""{print $2}')
+python manage.py create_user
 #杀死占用80端口的进程
+kill -9 $(lsof -i:80|tail -1|awk '"$1"!=""{print $2}')
+#配置前端nginx
 yum -y install nginx
 systemctl start  nginx.service
 systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
-#启动gunicorn开启日志并在后台运行
-nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&  
-#运行爬虫并在后台运行
+#启动后端gunicorn+gevent,开启日志并在后台运行
+nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&  
+#启动爬虫并在后台运行
 nohup python simdht_worker.py >/dev/zero 2>&1& 
+#启动supervisor
+supervisord -c /root/zsky/zskysuper.conf
+#编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
@@ -97,18 +102,19 @@ echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
 echo "cd /root/zsky/" >> /etc/rc.d/rc.local
 echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
-echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
+echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
-#设置计划任务,每天早上5点进行主索引
+echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
+#设置计划任务,每天早上5点进行主索引,每隔3小时进行增量索引并与主索引合并
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
 systemctl enable crond.service
 crontab -l > /tmp/crontab.bak
-echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate&&/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf' >> /tmp/crontab.bak
+echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate&&/usr/local/sphinx-jieba/bin/searchd --config ~/zsky/sphinx.conf' >> /tmp/crontab.bak
 crontab /tmp/crontab.bak
 echo '当前进程运行状态:'
+pgrep -l nginx
 pgrep -l searchd
 pgrep -l gunicorn
-pgrep -l nginx
