@@ -73,7 +73,6 @@ cd /root/zsky
 nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 0.0.0.0:8000 -w 4 --reload>/dev/zero 2>&1&  
 #运行爬虫并在后台运行
 nohup python simdht_worker.py >/dev/zero 2>&1& 
-supervisord -c /root/zsky/zskysuper.conf
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/c4ys/sphinx-jieba
 cd sphinx-jieba
@@ -102,7 +101,6 @@ echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_er
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
-echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
