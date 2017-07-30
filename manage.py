@@ -8,7 +8,7 @@ import time
 import os
 import datetime
 import logging
-from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify
+from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
 from flask_login import LoginManager,UserMixin,current_user, login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager, Shell
@@ -24,6 +24,7 @@ from getpass import getpass
 from flask_caching import Cache
 from werkzeug.security import generate_password_hash,check_password_hash
 import jieba
+import jieba.analyse
 import pymysql
 #from flask_debugtoolbar import DebugToolbarExtension
 
@@ -75,11 +76,11 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"世界那么大，我要去看看"})
+    search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"搜索电影,软件,图片,资料,番号...."})
     submit = SubmitField('搜索')
 
 class Search_Filelist(db.Model):
-    """ 这个表可以定期删除 """
+    """ 这个表可以定期清空数据 """
     __tablename__ = 'search_filelist'
     info_hash = db.Column(db.String(40), primary_key=True,nullable=False)
     file_list = db.Column(db.Text,nullable=False)
@@ -154,7 +155,7 @@ def load_user(id):
 
 
 @app.route('/',methods=['GET','POST'])
-#@cache.cached(timeout=60)
+#@cache.cached(60*60*24)
 def index():
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
@@ -177,8 +178,8 @@ def search():
         return redirect(url_for('index'))
     return redirect(url_for('search_results',query=form.search.data))
 
-@app.route('/main-search.html-kw-<query>/',methods=['GET','POST'])
-#@cache.cached(timeout=60,key_prefix=make_cache_key)
+@app.route('/main-search-kw-<query>.html',methods=['GET','POST'])
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results(query=None):
     connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
@@ -208,7 +209,7 @@ def search_results(query=None):
 
 
 @app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
-#@cache.cached(timeout=60,key_prefix=make_cache_key)
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results_bylength(query):
     connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
@@ -237,19 +238,32 @@ def search_results_bylength(query):
     return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
-#@cache.cached(timeout=60)
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(id):
-    hash=Search_Hash.query.filter_by(id=id).first()
-    fenci_list=jieba.cut(hash.name, cut_all=False)
+    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE id=%s'
+    curr.execute(querysql,int(id))
+    result=curr.fetchone()
+    curr.close()
+    conn.close()
+    #hash=Search_Hash.query.filter_by(id=id).first()
+    if not result:
+        return redirect(url_for('index'))        
+    fenci_list=jieba.analyse.extract_tags(result['name'], 8)
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
     form=SearchForm()
-    return render_template('detail.html',form=form,hash=hash,fenci_list=fenci_list)
+    return render_template('detail.html',form=form,tags=tags,hash=result,fenci_list=fenci_list)
 
+
+@app.route('/robots.txt')
+@app.route('/sitemap.xml')
+def static_from_root():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.errorhandler(404)
 def notfound(e):
     return render_template("404.html"),404
-
 
 
 class MyAdminIndexView(AdminIndexView):
