@@ -75,6 +75,7 @@ class LoginForm(FlaskForm):
         return db.session.query(User).filter_by(name=self.name.data).first()
 
 
+
 class SearchForm(FlaskForm):
     search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"搜索电影,软件,图片,资料,番号...."})
     submit = SubmitField('搜索')
