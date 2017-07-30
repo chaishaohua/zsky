@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>{{hash.name}} - 纸上烤鱼,磁力链接,磁力搜索</title>
+<title>{{hash['name'].encode('utf8')}} - 纸上烤鱼,磁力链接,磁力搜索</title>
 <meta name="keywords" content=""/>
 <meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
 <meta name="viewport" content="width=device-width"/>
@@ -12,9 +12,7 @@
 </head>
 <body>
 <div id="wrapper">
-<div class="top-bar"> <span class="first"><a href="/">种子搜索</a></span>
-<span class="second"><a href="/tags">种子大全</a></span>
-<span class="second"><a href="/top">排行</a></span>
+<div class="top-bar"><span class="first"><a href="/">种子搜索</a></span>
 <select autocomplete="off" onchange="changeLanguage(this.value)">
 <option value="KR">한국어</option>
 <option value="EN">English</option>
@@ -34,7 +32,7 @@
 
 <div id="content">
 <div id="wall">
-<h2>{{hash.name}}</h2>
+<h2>{{hash['name'].encode('utf8')}}</h2>
 <div class="detail-panel detail-width">
 <table class="detail-table detail-width">
 <tbody>
@@ -45,13 +43,13 @@
 <th>文件大小</th>
 </tr>
 <tr>
-<td>{{hash.category}}</td>
-<td>{{hash.create_time}}</td>
-<td>{{hash.requests}}</td>
+<td>{{hash['category']}}</td>
+<td>{{hash['create_time']|todate}}</td>
+<td>{{hash['requests']}}</td>
 <td>
-{% if hash.length>1073741824 %}
-{{(hash.length/1073741824)|round(2)}}G
-{% else %}{{(hash.length/1048576)|round(2)}}M
+{% if hash['length']>1073741824 %}
+{{(hash['length']/1073741824)|round(2)}}G
+{% else %}{{(hash['length']/1048576)|round(2)}}M
 {%endif%}
 </td>
 </tr>
@@ -60,14 +58,14 @@
 <div class="detail-panel detail-width">
 <div class="panel-header">磁力链接</div>
 <div class="panel-body">
-<a href="magnet:?xt=urn:btih:{{hash.info_hash | upper}}">magnet:?xt=urn:btih:{{hash.info_hash | upper}}</a>
+<a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}">magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}</a>
 </div>
 </div>
 <div class="detail-panel detail-width">
 <div class="panel-header">你可能喜欢</div>
 <div class="panel-body">
 {%for fenci in fenci_list%}
-<a href="{{url_for('search_results',query=fenci)}}">{{fenci}}</a>&nbsp;&nbsp;
+<a href="{{url_for('search_results',query=fenci)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
 {%endfor%}
 </div>
 </div>
