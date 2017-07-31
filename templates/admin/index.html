@@ -5,11 +5,16 @@
 
     <div>
         {% if current_user.is_authenticated %}
-        <h1>{{current_user.name}} 欢迎回来！</h1>
+        <h4>{{current_user.name}} 欢迎回来！</h4>
         <p class="lead"></p>
-         <p>
-            后台更多功能请耐心等待…
-        </p>
+
+      <p>数据概览:</p>                                          
+	<div class="alert alert-success alert-dismissable">
+		 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	</h4> 共爬取到 {{total}}条资源, 今日新增 {{today}}条
+			</div>    
+
+
         {% else %}
         <form method="POST" action="">
             {{ form.hidden_tag() if form.hidden_tag }}
