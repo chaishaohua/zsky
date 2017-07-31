@@ -1,6 +1,5 @@
 #!/bin/sh
 #By 我本戏子 2017.7
-#1.1 解决部分主机无法安装pip和redis的问题
 cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
