@@ -75,7 +75,6 @@ class LoginForm(FlaskForm):
         return db.session.query(User).filter_by(name=self.name.data).first()
 
 
-
 class SearchForm(FlaskForm):
     search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"搜索电影,软件,图片,资料,番号...."})
     submit = SubmitField('搜索')
@@ -158,9 +157,21 @@ def load_user(id):
 @app.route('/',methods=['GET','POST'])
 #@cache.cached(60*60*24)
 def index():
+    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    totalsql='select count(*) from film'
+    curr.execute(totalsql)
+    totalcounts=curr.fetchall()
+    total=int(totalcounts[0]['count(*)'])
+    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day limit 0,50000000'
+    curr.execute(todaysql)
+    todaycounts=curr.fetchall()
+    today=int(todaycounts[0]['count(*)'])
+    curr.close()
+    conn.close()
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
-    return render_template('index.html',form=form,keywords=keywords)
+    return render_template('index.html',form=form,keywords=keywords,total=total,today=today)
 
 
 def make_cache_key(*args, **kwargs):
@@ -363,5 +374,6 @@ def create_user(name,password,email):
 
 if __name__ == '__main__':
     manager.run()
+
 
 
