@@ -163,7 +163,7 @@ def index():
     curr.execute(totalsql)
     totalcounts=curr.fetchall()
     total=int(totalcounts[0]['count(*)'])
-    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day ORDER BY day DESC limit 1'
+    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day ORDER BY day limit 1'
     curr.execute(todaysql)
     todaycounts=curr.fetchall()
     today=int(todaycounts[0]['count(*)'])
@@ -281,10 +281,21 @@ def notfound(e):
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
+        connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+        currzsky = connzsky.cursor()
+        totalsql = 'select count(*) from search_hash'
+        currzsky.execute(totalsql)
+        totalcounts=currzsky.fetchall()
+        total=int(totalcounts[0]['count(*)'])
+        todaysql='SELECT DAY(create_time) AS day,count(*) FROM search_hash  GROUP BY day ORDER BY day DESC limit 1'
+        currzsky.execute(todaysql)
+        todaycounts=currzsky.fetchall()
+        today=int(todaycounts[0]['count(*)'])
+        currzsky.close()
+        connzsky.close()
         if not current_user.is_authenticated:
             return redirect(url_for('.login_view'))
-        
-        return super(MyAdminIndexView, self).index()
+        return self.render('admin/index.html',total=total,today=today)
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
         form = LoginForm(request.form)
@@ -312,6 +323,12 @@ class HashView(ModelView):
     edit_modal = True
     can_export = True
     column_searchable_list = ['name']
+    page=1
+    def get_list(self, *args, **kwargs):
+        count, data = super(HashView, self).get_list(*args, **kwargs)
+        count=100
+        data=Search_Hash.query.order_by(Search_Hash.id.desc()).limit(20)
+        return count,data
     def is_accessible(self):
         if current_user.is_authenticated :
             return True
@@ -344,7 +361,7 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('.login_view'))
 
-admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),base_template='admin/my_master.html')
+admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(UserView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
@@ -371,10 +388,22 @@ def create_user(name,password,email):
     user = User(name=name,password=password,email=email)
     db.session.add(user)
     db.session.commit()
+    print u"管理员创建成功!"
 
+@manager.option('-np', '--newpassword', dest='newpassword')
+def changepassword(newpassword):
+    name = raw_input(u'输入用户名:')
+    thisuser = User.query.filter_by(name=name).first()
+    if not thisuser:
+        print u"用户不存在,请重新输入用户名!"
+        name = raw_input(u'输入用户名:')    
+        thisuser = User.query.filter_by(name=name).first()
+    if newpassword is None:
+        newpassword = generate_password_hash(getpass(u'新密码:'))
+    thisuser.password=newpassword
+    db.session.add(thisuser)
+    db.session.commit()
+    print u"密码已更新,请牢记新密码!"
 
 if __name__ == '__main__':
     manager.run()
-
-
-
