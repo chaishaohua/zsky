@@ -163,7 +163,7 @@ def index():
     curr.execute(totalsql)
     totalcounts=curr.fetchall()
     total=int(totalcounts[0]['count(*)'])
-    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day limit 0,50000000'
+    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day ORDER BY day DESC limit 0,50000000'
     curr.execute(todaysql)
     todaycounts=curr.fetchall()
     today=int(todaycounts[0]['count(*)'])
