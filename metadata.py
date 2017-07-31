@@ -114,14 +114,7 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
     bigfname = files[0]['path']
     info['extension'] = metautils.get_extension(bigfname).lower()
     info['category'] = metautils.get_category(info['extension'])
-    if info['category'] == u'安装包':
-        pass
-    elif info['category'] ==  u'压缩文件':
-        pass
-    elif info['category'] ==  u'图像':
-        pass
-    elif info['category'] ==  u'文档书籍':
-        pass
+
 
     if 'files' in info:
         try:
