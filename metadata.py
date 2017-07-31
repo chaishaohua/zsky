@@ -44,9 +44,9 @@ def parse_metadata(data):
     except:
         return None
     try:
-        info['create_time'] = datetime.datetime.fromtimestamp(float(torrent['creation date']))
+        info['create_time'] = datetime.datetime.fromtimestamp(float(torrent['creation date']))+ datetime.timedelta(hours=8)
     except:
-        info['create_time'] = datetime.datetime.utcnow()
+        info['create_time'] = datetime.datetime.utcnow()+ datetime.timedelta(hours=8)
 
     if torrent.get('encoding'):
         encoding = torrent['encoding']
@@ -101,8 +101,9 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
     info['tagged'] = False
     info['classified'] = False
     info['requests'] = 1
-    info['last_seen'] = utcnow
+    info['last_seen'] = utcnow+ datetime.timedelta(hours=8)
     info['source_ip'] = address[0]
+	
 
     if info.get('files'):
         files = [z for z in info['files'] if not z['path'].startswith('_')]
@@ -115,7 +116,7 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
     info['extension'] = metautils.get_extension(bigfname).lower()
     info['category'] = metautils.get_category(info['extension'])
 
-
+	
     if 'files' in info:
         try:
             dbcurr.execute('INSERT  INTO search_filelist VALUES(%s, %s)', (info['info_hash'], json.dumps(info['files'])))
@@ -125,6 +126,8 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
 
     if info['category'] in [u'安装包',u'压缩文件',u'图像',u'文档书籍']:
         pass
+    
+    #只爬取中文资源
     #elif not re.findall(ur"[\u4e00-\u9fa5]+",info['name']):
     #    pass
     else:
