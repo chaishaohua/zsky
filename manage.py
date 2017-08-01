@@ -58,19 +58,20 @@ cache = Cache(app,config = {
 })
 cache.init_app(app)
 
+DB_HOST='127.0.0.1'
+DB_NAME_MYSQL='zsky'
+DB_PORT_MYSQL=3306
+DB_NAME_SPHINX='film'
+DB_PORT_SPHINX=9306
+DB_USER='root'
+DB_PASS=''
+DB_CHARSET='utf8mb4'
+
 
 
 class LoginForm(FlaskForm):
     name=StringField('用户名',validators=[DataRequired(),Length(1,32)])
     password=PasswordField('密码',validators=[DataRequired(),Length(1,20)])
-    #rememberme = BooleanField('记住我')
-    #submit=SubmitField('登录')
-    #def validate_login(self, field):
-    #    user = self.get_user()
-    #    if user is None:
-    #        raise ValidationError('用户名错误！')
-    #    if not check_password_hash(user.password, self.password.data):
-    #        raise ValidationError('密码错误！')
     def get_user(self):
         return db.session.query(User).filter_by(name=self.name.data).first()
 
@@ -79,17 +80,20 @@ class SearchForm(FlaskForm):
     search = StringField(validators = [DataRequired(message= '请输入关键字')],render_kw={"placeholder":"搜索电影,软件,图片,资料,番号...."})
     submit = SubmitField('搜索')
 
+
+class Sphinx_Counter(db.Model):
+    """ 索引记录,暂时不启用 """
+    __tablename__ = 'sphinx_counter'
+    counter_id  = db.Column(db.Integer,primary_key=True)
+    max_doc_id  = db.Column(db.Integer)
+
+
 class Search_Filelist(db.Model):
     """ 这个表可以定期清空数据 """
     __tablename__ = 'search_filelist'
     info_hash = db.Column(db.String(40), primary_key=True,nullable=False)
     file_list = db.Column(db.Text,nullable=False)
 
-class Sphinx_Counter(db.Model):
-    """ 索引记录 """
-    __tablename__ = 'sphinx_counter'
-    counter_id  = db.Column(db.Integer,primary_key=True)
-    max_doc_id  = db.Column(db.Integer)
 
 class Search_Hash(db.Model,UserMixin):
     __tablename__ = 'search_hash'
@@ -116,6 +120,12 @@ class Search_Keywords(db.Model):
     keyword = db.Column(db.String(20),nullable=False,unique=True)
     order = db.Column(db.Integer,nullable=False)
 
+class Search_Tags(db.Model):
+    """ 搜索记录 """
+    __tablename__ = 'search_tags'
+    id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
+    tag = db.Column(db.String(100),nullable=False,unique=True)
+
 class Search_Statusreport(db.Model):
     """ 爬取统计 """
     __tablename__ = 'search_statusreport'
@@ -125,11 +135,6 @@ class Search_Statusreport(db.Model):
     total_requests = db.Column(db.Integer,nullable=False)
     valid_requests = db.Column(db.Integer,nullable=False)
     
-class Search_Tags(db.Model):
-    """ 搜索记录 """
-    __tablename__ = 'search_tags'
-    id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    tag = db.Column(db.String(100),nullable=False,unique=True)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -148,6 +153,10 @@ class User(db.Model, UserMixin):
     def __unicode__(self):
         return self.username
 
+def make_shell_context():
+    return dict(app=app, db=db, Search_Filelist=Search_Filelist, Search_Hash=Search_Hash, Search_Keywords=Search_Keywords,Search_Tags=Search_Tags, Search_Statusreport=Search_Statusreport, User=User)
+manager.add_command("shell", Shell(make_context=make_shell_context))
+manager.add_command('db', MigrateCommand)
 
 @loginmanager.user_loader
 def load_user(id):
@@ -157,21 +166,17 @@ def load_user(id):
 @app.route('/',methods=['GET','POST'])
 #@cache.cached(60*60*24)
 def index():
-    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     totalsql='select count(*) from film'
     curr.execute(totalsql)
     totalcounts=curr.fetchall()
     total=int(totalcounts[0]['count(*)'])
-    todaysql='SELECT DAY(create_time) AS day,count(*) FROM film  GROUP BY day ORDER BY day limit 1'
-    curr.execute(todaysql)
-    todaycounts=curr.fetchall()
-    today=int(todaycounts[0]['count(*)'])
     curr.close()
     conn.close()
     keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
     form=SearchForm()
-    return render_template('index.html',form=form,keywords=keywords,total=total,today=today)
+    return render_template('index.html',form=form,keywords=keywords,total=total)
 
 
 def make_cache_key(*args, **kwargs):
@@ -179,9 +184,11 @@ def make_cache_key(*args, **kwargs):
     args = str(hash(frozenset(request.args.items())))
     return (path + args).encode('utf-8')
 
+
 def todate_filter(s):
     return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
 app.add_template_filter(todate_filter,'todate')
+
 
 @app.route('/search',methods=['GET','POST'])
 def search():
@@ -190,10 +197,11 @@ def search():
         return redirect(url_for('index'))
     return redirect(url_for('search_results',query=form.search.data))
 
+
 @app.route('/main-search-kw-<query>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results(query=None):
-    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
     currzsky.execute(taginsertsql,query)
@@ -201,7 +209,7 @@ def search_results(query=None):
     currzsky.close()
     connzsky.close()
     page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20'
     curr.execute(querysql,[query,(page-1)*20])
@@ -223,7 +231,7 @@ def search_results(query=None):
 @app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results_bylength(query):
-    connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
     currzsky.execute(taginsertsql,query)
@@ -231,7 +239,7 @@ def search_results_bylength(query):
     currzsky.close()
     connzsky.close()
     page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20'
     curr.execute(querysql,[query,(page-1)*20])
@@ -249,10 +257,11 @@ def search_results_bylength(query):
     form.search.data=query
     return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
+
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(id):
-    conn = pymysql.connect(host='127.0.0.1',port=9306,user='root',password='',db='film',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE id=%s'
     curr.execute(querysql,int(id))
@@ -273,6 +282,7 @@ def detail(id):
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
+
 @app.errorhandler(404)
 def notfound(e):
     return render_template("404.html"),404
@@ -281,16 +291,16 @@ def notfound(e):
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
-        connzsky = pymysql.connect(host='127.0.0.1',port=3306,user='root',password='',db='zsky',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+        connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
         currzsky = connzsky.cursor()
-        totalsql = 'select count(*) from search_hash'
+        totalsql = 'select count(id) from search_hash'
         currzsky.execute(totalsql)
         totalcounts=currzsky.fetchall()
-        total=int(totalcounts[0]['count(*)'])
-        todaysql='SELECT DAY(create_time) AS day,count(*) FROM search_hash  GROUP BY day ORDER BY day DESC limit 1'
+        total=int(totalcounts[0]['count(id)'])
+        todaysql='SELECT DAY(create_time) AS day,count(id) FROM search_hash  GROUP BY day ORDER BY day DESC limit 1'
         currzsky.execute(todaysql)
         todaycounts=currzsky.fetchall()
-        today=int(todaycounts[0]['count(*)'])
+        today=int(todaycounts[0]['count(id)'])
         currzsky.close()
         connzsky.close()
         if not current_user.is_authenticated:
