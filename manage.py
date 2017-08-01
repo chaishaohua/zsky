@@ -297,7 +297,7 @@ class MyAdminIndexView(AdminIndexView):
         currzsky.execute(totalsql)
         totalcounts=currzsky.fetchall()
         total=int(totalcounts[0]['count(id)'])
-        todaysql='SELECT DAY(create_time) AS day,count(id) FROM search_hash  GROUP BY day ORDER BY day DESC limit 1'
+        todaysql='select count(1) from search_hash  where to_days(search_hash.create_time)= to_days(now())'
         currzsky.execute(todaysql)
         todaycounts=currzsky.fetchall()
         today=int(todaycounts[0]['count(id)'])
