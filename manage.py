@@ -300,7 +300,7 @@ class MyAdminIndexView(AdminIndexView):
         todaysql='select count(1) from search_hash  where to_days(search_hash.create_time)= to_days(now())'
         currzsky.execute(todaysql)
         todaycounts=currzsky.fetchall()
-        today=int(todaycounts[0]['count(id)'])
+        today=int(todaycounts[0]['count(1)'])
         currzsky.close()
         connzsky.close()
         if not current_user.is_authenticated:
