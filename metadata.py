@@ -130,7 +130,7 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
             print name, u'insert error', sys.exc_info()[1]
         del info['files']
 
-    if info['category'] not in [u'影视',u'音乐']:
+    if info['category'] not in [u'影视',u'音乐',u'图像',u'文档书籍']:
         pass
     #elif not re.findall(ur"[\u4e00-\u9fa5]+",info['name']):
     #    pass
@@ -138,7 +138,7 @@ def save_metadata(dbcurr, binhash, address, start_time, data):
     else:
         try:
             try:
-                print '\n', (datetime.datetime.utcnow()+ datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S"),u'分类:',info['category'], u'Hash值:',info['info_hash'],u'片名:', info['name'], u'格式:', info['extension'], u'IP地址:',address[0],u'地区:', geoip.country_name_by_addr(address[0]),u'保存成功!'
+                print '\n', (datetime.datetime.utcnow()+ datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S"),u'分类:',info['category'], u'Hash值:',info['info_hash'],u'文件名:', info['name'], u'格式:', info['extension'], u'IP地址:',address[0],u'地区:', geoip.country_name_by_addr(address[0]),u'保存成功!'
             except:
                 print '\n',(datetime.datetime.utcnow()+ datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S"), u'insert error', info['info_hash'], sys.exc_info()[1]
             ret = dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
