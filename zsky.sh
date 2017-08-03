@@ -38,10 +38,6 @@ EOF
 echo ulimit -HSn 65536 >> /etc/rc.local
 echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
-yum -y install git 
-cd /root/
-git  clone https://github.com/wenguonideshou/zsky.git
-cd zsky
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install psmisc net-tools lsof epel-release
 yum -y install python-pip
@@ -52,6 +48,8 @@ pip install -r requirements.txt
 #wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 #yum clean metadata
 #yum makecache
+yum -y install git 
+cd /root/zsky
 cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
@@ -80,7 +78,7 @@ nohup python simdht_worker.py >/dev/zero 2>&1&
 supervisord -c /root/zsky/zskysuper.conf
 #编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
-git clone https://github.com/c4ys/sphinx-jieba
+git clone https://github.com/wenguonideshou/sphinx-jieba.git
 cd sphinx-jieba
 git submodule update --init --recursive
 ./configure --prefix=/usr/local/sphinx-jieba
