@@ -15,6 +15,7 @@ pip install DBUtils
 import hashlib
 import os
 import SimpleXMLRPCServer
+from SocketServer import ThreadingMixIn
 import time
 import datetime
 import traceback
@@ -30,7 +31,7 @@ from threading import Timer, Thread
 from time import sleep
 from collections import deque
 from Queue import Queue
-import pygeoip
+#import pygeoip
 import pymysql
 
 try:
@@ -53,20 +54,80 @@ DB_PASS = ''
 BOOTSTRAP_NODES = (
     ("router.bittorrent.com", 6881),
     ("dht.transmissionbt.com", 6881),
-    ("router.utorrent.com", 6881)
+    ("router.utorrent.com", 6881),
+    ('tracker.pirateparty.gr',6969),
+    ('tracker.coppersurfer.tk',6969),
+    ('tracker.leechers-paradise.org',6969),
+    ('9.rarbg.com',2710),
+    ('p4p.arenabg.com',1337),
+    ('tracker.opentrackr.org',1337),
+    ('public.popcorn-tracker.org',6969),
+    ('tracker.internetwarriors.net',1337),
+    ('tracker1.wasabii.com.tw',6969),
+    ('tracker.zer0day.to',1337),
+    ('tracker.mg64.net',6969),
+    ('peerfect.org',6969),
+    ('open.facedatabg.net',6969),
+    ('mgtracker.org',6969),
+    ('ipv4.tracker.harry.lu',80),
+    ('tracker.xku.tv',6969),
+    ('tracker.vanitycore.co',6969),
+    ('tracker.swateam.org.uk',2710),
+    ('packages.crunchbangplusplus.org',6969),
+    ('zephir.monocul.us',6969),
+    ('ulfbrueggemann.no-ip.org',6969),
+    ('trackerxyz.tk',1337),
+    ('tracker2.wasabii.com.tw',6969),
+    ('tracker2.christianbro.pw',6969),
+    ('tracker.tvunderground.org.ru',3218),
+    ('tracker.torrent.eu.org',451),
+    ('tracker.tiny-vps.com',6969),
+    ('tracker.kuroy.me',5944),
+    ('tracker.kamigami.org',2710),
+    ('tracker.halfchub.club',6969),
+    ('tracker.grepler.com',6969),
+    ('tracker.filetracker.pl',8089),
+    ('tracker.files.fm',6969),
+    ('tracker.edoardocolombo.eu',6969),
+    ('tracker.doko.moe',6969),
+    ('tracker.dler.org',6969),
+    ('tracker.desu.sh',6969),
+    ('tracker.cypherpunks.ru',6969),
+    ('tracker.cyberia.is',6969),
+    ('tracker.christianbro.pw',6969),
+    ('tracker.bluefrog.pw',2710),
+    ('tracker.acg.gg',2710),
+    ('tr.cili001.com',6666),
+    ('thetracker.org',80),
+    ('retracker.lanta-net.ru',2710),
+    ('inferno.demonoid.pw',3418),
+    ('explodie.org',6969),
+    ('bt.xxx-tracker.com',2710),
+    ('86.19.29.160',6969),
+    ('208.67.16.113',8000),
+    ('z.crazyhd.com',2710),
+    ('tracker1.xku.tv',6969),
+    ('tracker.skyts.net',6969),
+    ('tracker.safe.moe',6969),
+    ('tracker.piratepublic.com',1337),
+    ('tracker.justseed.it',1337),
+    ('sandrotracker.biz',1337),
+    ('oscar.reyesleon.xyz',6969),
+    ('open.stealth.si',80),
+    ('allesanddro.de',1337),
 )
 TID_LENGTH = 2
 RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
-MAX_QUEUE_LT = 30
-MAX_QUEUE_PT = 200
+MAX_QUEUE_LT = 10000
+MAX_QUEUE_PT = 10000
 
-geoip = pygeoip.GeoIP('GeoIP.dat')
+#geoip = pygeoip.GeoIP('GeoIP.dat')
 
 
-def is_ip_allowed(ip):
-    return geoip.country_code_by_addr(ip) not in ('CN','TW','HK')
+#def is_ip_allowed(ip):
+#    return geoip.country_code_by_addr(ip) not in ('CN','TW','HK')
 
 def entropy(length):
     return "".join(chr(randint(0, 255)) for _ in xrange(length))
@@ -287,7 +348,7 @@ class Master(Thread):
         self.metadata_queue = Queue()
         from DBUtils.PooledDB import PooledDB
         self.pool = PooledDB(pymysql,50,host=DB_HOST,user=DB_USER,passwd=DB_PASS,db=DB_NAME,port=3306,charset="utf8mb4") #50为连接池里的最少连接数
-        self.dbconn = self.pool.connection() #以后每次需要数据库连接就用connection（）函数获取连接
+        self.dbconn = self.pool.connection() 
         #self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, charset='utf8mb4')
         #self.dbconn.autocommit(False)
         self.dbcurr = self.dbconn.cursor()
@@ -312,7 +373,7 @@ class Master(Thread):
 
     def run(self):
         self.name = threading.currentThread().getName()
-        print self.name, 'started'
+        print self.name, 'starting'
         while True:
             while self.metadata_queue.qsize() > 0:
                 self.got_torrent()
@@ -354,8 +415,8 @@ class Master(Thread):
                     'total_requests=total_requests+%s, valid_requests=valid_requests+%s, new_hashes=new_hashes+%s',
                     (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
                 self.dbconn.commit()
-                print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
-                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt, 
+                #print '\n', date, u'总请求数:', self.n_reqs, u'可用数:', self.n_valid, u'新Hash:', self.n_new, u'队列长度:', self.queue.qsize(), 
+                #print u'simMetadata下载数:', self.n_downloading_pt, u'ltMetadata下载数:', self.n_downloading_lt, 
                 self.n_reqs = self.n_valid = self.n_new = 0
 
     def log_announce(self, binhash, address=None):
@@ -364,8 +425,8 @@ class Master(Thread):
     def log_hash(self, binhash, address=None):
         if not lt:
             return
-        if is_ip_allowed(address[0]):
-            return
+        #if is_ip_allowed(address[0]):
+        #    return
         if self.n_downloading_lt < MAX_QUEUE_LT:
             self.queue.put([address, binhash, 'lt'])
 
@@ -376,15 +437,18 @@ def announce(info_hash, address):
     return 'ok'
 
 
+class ThreadXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer.SimpleXMLRPCServer):
+    pass
+
 def rpc_server():
-    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 8004), logRequests=False)
+    rpcserver = ThreadXMLRPCServer(('localhost', 8004), logRequests=False)
     rpcserver.register_function(announce, 'announce')
-    print 'Starting xml rpc server...'
+    print 'Start xmlrpcserver...'
     rpcserver.serve_forever()
 
 
 if __name__ == "__main__":
-    # max_node_qsize bigger, bandwith bigger, spped higher
+    # max_node_qsize越大，占用带宽越大，爬取速度越快
     master = Master()
     master.start()
 
@@ -395,5 +459,3 @@ if __name__ == "__main__":
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
     dht.start()
     dht.auto_send_find_node()
-
-
