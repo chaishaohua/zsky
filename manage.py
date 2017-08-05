@@ -4,6 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import codecs
 import time
 import os
 import datetime
@@ -303,11 +304,11 @@ class MyAdminIndexView(AdminIndexView):
         connzsky.close()
         logfile='/root/zsky/spider.log'
         if os.path.exists(logfile):
-            body = open(logfile, 'r').readlines()[-20:]
+            body = codecs.open(logfile, 'r' ,encoding='utf-8', errors='ignore').readlines()[-20:]
         else:
             os.mknod(logfile)
-            body = open(logfile, 'r').readlines()[-20:]
-        htmlbody = '\n'.join('<p>%s</p>' % line.encode('utf-8') for line in body)
+            body = codecs.open(logfile, 'r',encoding='utf-8' , errors='ignore').readlines()[-20:]
+        htmlbody = '\n'.join('<p>%s</p>' % line for line in body)
         if not current_user.is_authenticated:
             return redirect(url_for('admin.login_view'))
         return self.render('admin/index.html',total=total,today=today,htmlbody=htmlbody)
