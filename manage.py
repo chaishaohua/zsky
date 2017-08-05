@@ -304,7 +304,7 @@ class MyAdminIndexView(AdminIndexView):
         currzsky.close()
         connzsky.close()
         if not current_user.is_authenticated:
-            return redirect(url_for('.login_view'))
+            return redirect(url_for('admin.login_view'))
         return self.render('admin/index.html',total=total,today=today)
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
@@ -318,14 +318,14 @@ class MyAdminIndexView(AdminIndexView):
             elif user is not None and check_password_hash(user.password, form.password.data):
                 login_user(user)
         if current_user.is_authenticated:
-            return redirect(url_for('.index'))
+            return redirect(url_for('admin.index'))
         self._template_args['form'] = form
         #self._template_args['link'] = link
         return super(MyAdminIndexView, self).index()
     @expose('/logout/')
     def logout_view(self):
         logout_user()
-        return redirect(url_for('.index'))
+        return redirect(url_for('admin.index'))
 
     
 class HashView(ModelView):
@@ -344,7 +344,7 @@ class HashView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('.login_view'))
+        return redirect(url_for('admin.login_view'))
 
 
 class TagsView(ModelView):
@@ -357,7 +357,7 @@ class TagsView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('.login_view'))
+        return redirect(url_for('admin.login_view'))
 
 class UserView(ModelView):
     #column_exclude_list = 'password'
@@ -369,7 +369,7 @@ class UserView(ModelView):
             return True
         return False
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('.login_view'))
+        return redirect(url_for('admin.login_view'))
 
 admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
