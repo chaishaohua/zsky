@@ -10,16 +10,19 @@ import os
 import datetime
 #import logging
 from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
-from flask_login import LoginManager,UserMixin,current_user, login_required,login_user,logout_user
+from flask_login import LoginManager,UserMixin,current_user,login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextField
 from wtforms.validators import DataRequired,Length,EqualTo,ValidationError
-from flask_babelex import Babel
+from flask_moment import Moment
+from flask_babelex import Babel,gettext
 from flask_admin import helpers, AdminIndexView, Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.fileadmin import FileAdmin
+from flask_admin.form.upload import ImageUploadField
 from getpass import getpass
 from flask_caching import Cache
 from werkzeug.security import generate_password_hash,check_password_hash
@@ -28,6 +31,7 @@ import jieba.analyse
 import pymysql
 #from flask_debugtoolbar import DebugToolbarExtension
 
+file_path = os.path.join(os.path.dirname(__file__), 'uploads')
 # Initialize Flask and set some config values
 app = Flask(__name__)
 app.config['DEBUG']=True
@@ -41,6 +45,7 @@ app.config['SQLALCHEMY_POOL_SIZE']=5000
 db = SQLAlchemy(app)
 manager = Manager(app)
 migrate = Migrate(app, db)
+moment=Moment(app)
 babel = Babel(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 loginmanager=LoginManager()
@@ -65,7 +70,6 @@ DB_PORT_SPHINX=9306
 DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
-
 
 
 class LoginForm(FlaskForm):
@@ -118,6 +122,8 @@ class Search_Keywords(db.Model):
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
     keyword = db.Column(db.String(20),nullable=False,unique=True)
     order = db.Column(db.Integer,nullable=False)
+    pic = db.Column(db.String(255),nullable=False)
+    score = db.Column(db.String(10),nullable=False)
 
 class Search_Tags(db.Model):
     """ 搜索记录 """
@@ -177,7 +183,6 @@ def index():
     form=SearchForm()
     return render_template('index.html',form=form,keywords=keywords,total=total)
 
-
 def make_cache_key(*args, **kwargs):
     path = request.path
     args = str(hash(frozenset(request.args.items())))
@@ -210,7 +215,7 @@ def search_results(query=None):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20'
+    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=1000, max_query_time=50'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -240,7 +245,7 @@ def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -256,6 +261,64 @@ def search_results_bylength(query):
     form.search.data=query
     return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
+
+@app.route('/main-search-kw-<query>-px-3.html',methods=['GET','POST'])
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+def search_results_bycreate_time(query):
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
+    page=request.args.get('page',1,type=int)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    form=SearchForm()
+    form.search.data=query
+    return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+
+@app.route('/main-search-kw-<query>-px-4.html',methods=['GET','POST'])
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+def search_results_byrequests(query):
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
+    page=request.args.get('page',1,type=int)
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    curr.execute(querysql,[query,(page-1)*20])
+    result=curr.fetchall()
+    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
+    form=SearchForm()
+    form.search.data=query
+    return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
 
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
@@ -281,6 +344,9 @@ def detail(id):
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
+@app.route('/uploads/<filename>')
+def uploadpics(filename):
+    return send_from_directory(file_path, filename)
 
 @app.errorhandler(404)
 def notfound(e):
@@ -296,10 +362,10 @@ class MyAdminIndexView(AdminIndexView):
         currzsky.execute(totalsql)
         totalcounts=currzsky.fetchall()
         total=int(totalcounts[0]['count(id)'])
-        todaysql='select count(1) from search_hash  where to_days(search_hash.create_time)= to_days(now())'
+        todaysql='select count(id) from search_hash where to_days(search_hash.create_time)= to_days(now())'
         currzsky.execute(todaysql)
         todaycounts=currzsky.fetchall()
-        today=int(todaycounts[0]['count(1)'])
+        today=int(todaycounts[0]['count(id)'])
         currzsky.close()
         connzsky.close()
         logfile='/root/zsky/spider.log'
@@ -312,7 +378,6 @@ class MyAdminIndexView(AdminIndexView):
         if not current_user.is_authenticated:
             return redirect(url_for('admin.login_view'))
         return self.render('admin/index.html',total=total,today=today,htmlbody=htmlbody)
-
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
         form = LoginForm(request.form)
@@ -329,7 +394,6 @@ class MyAdminIndexView(AdminIndexView):
         self._template_args['form'] = form
         #self._template_args['link'] = link
         return super(MyAdminIndexView, self).index()
-    
     @expose('/logout/')
     def logout_view(self):
         logout_user()
@@ -367,6 +431,18 @@ class TagsView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
+
+class KeywordsView(ModelView):
+    create_modal = True
+    edit_modal = True
+    can_export = True
+    def is_accessible(self):
+        if current_user.is_authenticated :
+            return True
+        return False
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('admin.login_view'))
+
 class UserView(ModelView):
     #column_exclude_list = 'password'
     create_modal = True
@@ -381,9 +457,10 @@ class UserView(ModelView):
 
 admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
-admin.add_view(UserView(Search_Keywords, db.session,name='首页推荐'))
+admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
 admin.add_view(UserView(Search_Statusreport, db.session,name='爬取统计'))
+admin.add_view(FileAdmin(file_path, '/uploads/', name='文件管理'))
 admin.add_view(UserView(User, db.session,name='用户管理'))
 
 
