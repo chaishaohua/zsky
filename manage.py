@@ -306,7 +306,7 @@ class MyAdminIndexView(AdminIndexView):
         if os.path.exists(logfile):
             body = open(logfile, 'r').readlines()[-20:]
         else:
-            os.mkdirs(logfile)
+            os.mknod(logfile)
             body = open(logfile, 'r').readlines()[-20:]
         htmlbody = '\n'.join('<p>%s</p>' % line.encode('utf-8') for line in body)
         if not current_user.is_authenticated:
