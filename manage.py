@@ -7,7 +7,7 @@ sys.setdefaultencoding('utf-8')
 import time
 import os
 import datetime
-import logging
+#import logging
 from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
 from flask_login import LoginManager,UserMixin,current_user, login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
@@ -16,7 +16,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextField
 from wtforms.validators import DataRequired,Length,EqualTo,ValidationError
-from flask_moment import Moment
 from flask_babelex import Babel
 from flask_admin import helpers, AdminIndexView, Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
