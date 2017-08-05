@@ -302,9 +302,17 @@ class MyAdminIndexView(AdminIndexView):
         today=int(todaycounts[0]['count(1)'])
         currzsky.close()
         connzsky.close()
+        logfile='/root/zsky/spider.log'
+        if os.path.exists(logfile):
+            body = open(logfile, 'r').readlines()[-20:]
+        else:
+            os.mkdirs(logfile)
+            body = open(logfile, 'r').readlines()[-20:]
+        htmlbody = '\n'.join('<p>%s</p>' % line.encode('utf-8') for line in body)
         if not current_user.is_authenticated:
             return redirect(url_for('admin.login_view'))
-        return self.render('admin/index.html',total=total,today=today)
+        return self.render('admin/index.html',total=total,today=today,htmlbody=htmlbody)
+
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
         form = LoginForm(request.form)
@@ -321,6 +329,7 @@ class MyAdminIndexView(AdminIndexView):
         self._template_args['form'] = form
         #self._template_args['link'] = link
         return super(MyAdminIndexView, self).index()
+    
     @expose('/logout/')
     def logout_view(self):
         logout_user()
