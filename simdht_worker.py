@@ -278,7 +278,7 @@ class Master(Thread):
         self.dbconn = self.pool.connection()
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8mb4')
-        #self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, 'ssbc', charset='utf8')
+        #self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, charset='utf8')
         #self.dbconn.autocommit(False)
         #self.dbcurr = self.dbconn.cursor()
         #self.dbcurr.execute('SET NAMES utf8')
@@ -317,7 +317,7 @@ class Master(Thread):
 
             utcnow = datetime.datetime.utcnow()
             date = (utcnow + datetime.timedelta(hours=8))
-            date = datetime.datetime(date.year, date.month, date.day, day.hour, date.minute, date.second)
+            date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second)
 
             # Check if we have this info_hash
             self.dbcurr.execute('SELECT id FROM search_hash WHERE info_hash=%s', (info_hash,))
