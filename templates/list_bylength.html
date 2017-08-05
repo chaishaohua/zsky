@@ -31,8 +31,10 @@
 
 </div>
 <div id="sort-bar">
-<a href="#">文件大小</a>
-<a href="{{url_for('search_results',query=query)}}"><b>创建时间</b></a>
+<a href="#"><b>文件大小</b></a>
+<a href="{{url_for('search_results',query=query)}}">相关度</a>
+<a href="{{url_for('search_results_bycreate_time',query=query)}}">创建时间</a>
+<a href="{{url_for('search_results_byrequests',query=query)}}">热度</a>
 </div>
 <div id="content">
 <div id="wall">
@@ -56,7 +58,7 @@
 <b class="cpill yellow-pill">{{(hash['length']/1073741824)|round(2)}}G</b>
 {% else %}<b class="cpill blue-pill">{{(hash['length']/1048576)|round(2)}}M</b>
 {%endif%}</span>
-<span>热度：<b></b></span>
+<span>热度：<b>{{hash['requests']}}</b></span>
 <span><img src="{{ url_for('static', filename='img/link.png') }}"  /><a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" >磁力链接</a></span>
 </div>
 </div>
@@ -68,13 +70,13 @@
 {%if page==1%}
 <span>上一页</span>
 {%else%}
-<a href="{{ url_for('search_results', query=query,page=page-1 )}}">上一页</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=page-1 )}}">上一页</a>
 {%endif%}
 {%for i in range(1,pages+1)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=i) }}">{{i}}</a>
 {%endfor%}
 {%if page<pages%}
-<a href="{{ url_for('search_results', query=query,page=page+1) }}">下一页</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=page+1) }}">下一页</a>
 {%else%}
 <span>下一页</span>
 {%endif%}    
@@ -82,17 +84,17 @@
 {%if page==1%}
 <span>上一页</span>
 {%else%}
-<a href="{{ url_for('search_results', query=query,page=page-1 )}}">上一页</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=page-1 )}}">上一页</a>
 {%endif%}
 {%for i in range(prev_pages,page)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=i) }}">{{i}}</a>
 {%endfor%}
 <a href="#">{{page}}</a>
 {%for i in range(page+1,next_pages+1)%}
-<a href="{{ url_for('search_results', query=query,page=i) }}">{{i}}</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=i) }}">{{i}}</a>
 {%endfor%}
 {%if page<pages%}
-<a href="{{ url_for('search_results', query=query,page=page+1) }}">下一页</a>
+<a href="{{ url_for('search_results_bylength', query=query,page=page+1) }}">下一页</a>
 {%else%}
 <span>下一页</span>
 {%endif%}
