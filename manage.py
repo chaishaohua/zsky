@@ -40,7 +40,6 @@ app.config['SQLALCHEMY_POOL_SIZE']=5000
 db = SQLAlchemy(app)
 manager = Manager(app)
 migrate = Migrate(app, db)
-moment=Moment(app)
 babel = Babel(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 loginmanager=LoginManager()
