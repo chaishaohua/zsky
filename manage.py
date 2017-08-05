@@ -17,7 +17,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextField
 from wtforms.validators import DataRequired,Length,EqualTo,ValidationError
-from flask_moment import Moment
 from flask_babelex import Babel,gettext
 from flask_admin import helpers, AdminIndexView, Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
@@ -45,7 +44,6 @@ app.config['SQLALCHEMY_POOL_SIZE']=5000
 db = SQLAlchemy(app)
 manager = Manager(app)
 migrate = Migrate(app, db)
-moment=Moment(app)
 babel = Babel(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 loginmanager=LoginManager()
