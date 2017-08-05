@@ -70,6 +70,7 @@ systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
+mkdir uploads
 #启动后端gunicorn+gevent,开启日志并在后台运行
 nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&  
 #启动爬虫,开启日志并在后台运行
