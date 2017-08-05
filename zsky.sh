@@ -72,8 +72,8 @@ nginx -s reload
 cd /root/zsky
 #启动后端gunicorn+gevent,开启日志并在后台运行
 nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&  
-#启动爬虫并在后台运行
-nohup python simdht_worker.py >/dev/zero 2>&1& 
+#启动爬虫,开启日志并在后台运行
+nohup python simdht_worker.py >/root/zsky/spider.log 2>&1& 
 #启动supervisor
 supervisord -c /root/zsky/zskysuper.conf
 #编译sphinx,启动索引,启动搜索进程
@@ -100,7 +100,7 @@ echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
 echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
 echo "cd /root/zsky/" >> /etc/rc.d/rc.local
-echo "nohup python simdht_worker.py >/dev/zero 2>&1&" >> /etc/rc.d/rc.local
+echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.d/rc.local
 echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
