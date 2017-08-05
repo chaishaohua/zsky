@@ -325,7 +325,7 @@ class Master(Thread):
             if y:
                 self.n_valid += 1
                 # 更新最近发现时间，请求数
-                self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (utcnow, info_hash))
+                self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (date, info_hash))
             else:
                 if dtype == 'pt':
                     t = threading.Thread(target=simMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
