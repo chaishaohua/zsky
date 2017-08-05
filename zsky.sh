@@ -50,6 +50,7 @@ pip install -r requirements.txt
 #yum makecache
 yum -y install git 
 cd /root/zsky
+mkdir uploads
 cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
