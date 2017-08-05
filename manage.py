@@ -82,13 +82,6 @@ class SearchForm(FlaskForm):
     submit = SubmitField('搜索')
 
 
-class Sphinx_Counter(db.Model):
-    """ 索引记录,暂时不启用 """
-    __tablename__ = 'sphinx_counter'
-    counter_id  = db.Column(db.Integer,primary_key=True)
-    max_doc_id  = db.Column(db.Integer)
-
-
 class Search_Filelist(db.Model):
     """ 这个表可以定期清空数据 """
     __tablename__ = 'search_filelist'
