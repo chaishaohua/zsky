@@ -50,7 +50,9 @@ pip install -r requirements.txt
 #yum makecache
 yum -y install git 
 cd /root/zsky
-mkdir uploads
+mkdir /root/zsky/uploads
+cp systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
+systemctl daemon-reload	
 cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
@@ -71,13 +73,11 @@ systemctl enable  nginx.service
 cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
-mkdir uploads
 #启动后端gunicorn+gevent,开启日志并在后台运行
-nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&  
+systemctl start gunicorn
+systemctl enable gunicorn
 #启动爬虫,开启日志并在后台运行
 nohup python simdht_worker.py >/root/zsky/spider.log 2>&1& 
-#启动supervisor
-supervisord -c /root/zsky/zskysuper.conf
 #编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/wenguonideshou/sphinx-jieba.git
@@ -94,8 +94,10 @@ cp etc/user.dict.utf8 etc/xdictuser.dict.utf8
 cp etc/hmm_model.utf8 etc/xdicthmm_model.utf8
 cp etc/idf.utf8 etc/xdictidf.utf8
 cp etc/stop_words.utf8 etc/xdictstop_words.utf8
-/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate
-/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf
+systemctl start indexer	
+systemctl enable indexer
+systemctl start searchd	
+systemctl enable searchd
 #开机自启动
 chmod +x /etc/rc.d/rc.local
 echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
@@ -107,7 +109,6 @@ echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_er
 echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
-echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
