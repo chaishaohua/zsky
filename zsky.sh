@@ -103,11 +103,10 @@ chmod +x /etc/rc.d/rc.local
 echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
 echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
-echo "cd /root/zsky/" >> /etc/rc.d/rc.local
+echo "systemctl start  gunicorn.service" >> /etc/rc.d/rc.local
+echo "systemctl start  indexer.service" >> /etc/rc.d/rc.local
+echo "systemctl start  searchd.service" >> /etc/rc.d/rc.local
 echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.d/rc.local
-echo "nohup gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4 --reload>/dev/zero 2>&1&"  >> /etc/rc.d/rc.local
-echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /etc/rc.d/rc.local
-echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
