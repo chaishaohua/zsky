@@ -108,7 +108,7 @@ echo "/usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film" >> /et
 echo "/usr/local/sphinx-jieba/bin/searchd --config /root/zsky/sphinx.conf" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
 echo "supervisord -c /root/zsky/zskysuper.conf" >> /etc/rc.d/rc.local
-#设置计划任务,每天早上5点进行主索引,每隔3小时进行增量索引并与主索引合并
+#设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
 systemctl enable crond.service
