@@ -1,10 +1,12 @@
 使用说明
 ---
+```Bash
 yum -y install git 
 
 git  clone https://github.com/wenguonideshou/zsky.git
 
 cd zsky&&sh zsky.sh
+```
 
 此一键包只在centos7系统有效
 
