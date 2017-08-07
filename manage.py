@@ -120,7 +120,7 @@ class Search_Tags(db.Model):
     """ 搜索记录 """
     __tablename__ = 'search_tags'
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
-    tag = db.Column(db.String(100),nullable=False,unique=True)
+    tag = db.Column(db.String(50),nullable=False,unique=True)
 
 class Search_Statusreport(db.Model):
     """ 爬取统计 """
