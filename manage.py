@@ -330,8 +330,29 @@ def detail(id):
     return render_template('detail.html',form=form,tags=tags,hash=result,fenci_list=fenci_list)
 
 
-@app.route('/robots.txt')
 @app.route('/sitemap.xml')
+def sitemap():    
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    querysql='SELECT id,create_time FROM film order by create_time desc limit 100'
+    curr.execute(querysql)
+    rows=curr.fetchall()
+    curr.close()
+    conn.close()
+    sitemaplist=[]
+    for row in rows:
+        id = row['id']
+        mtime = datetime.datetime.fromtimestamp(int(row['create_time'])).strftime('%Y-%m-%d')
+        url = request.url_root+'main-show-id-{}-dbid-0.html'.format(id)
+        url_xml = '<url><loc>{}</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(url, mtime)
+        sitemaplist.append(url_xml)
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?><urlset>{}</urlset>'.format("".join(x for x in sitemaplist))
+    with open('static/sitemap.xml', 'wb') as f:
+        f.write(xml_content)
+        f.close()
+    return send_from_directory(app.static_folder, request.path[1:])
+
+@app.route('/robots.txt')
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
@@ -446,7 +467,7 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
-admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
