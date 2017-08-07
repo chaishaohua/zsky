@@ -206,7 +206,7 @@ def search_results(query=None):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -236,7 +236,7 @@ def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -266,7 +266,7 @@ def search_results_bycreate_time(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -295,7 +295,7 @@ def search_results_byrequests(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000, max_query_time=50'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
