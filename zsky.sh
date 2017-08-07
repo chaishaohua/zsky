@@ -1,6 +1,6 @@
 #!/bin/sh
 #By 我本戏子 2017.7
-cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
+\cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
 systemctl stop iptables.service  
@@ -70,7 +70,7 @@ kill -9 $(lsof -i:80|tail -1|awk '"$1"!=""{print $2}')
 yum -y install nginx
 systemctl start  nginx.service
 systemctl enable  nginx.service
-cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
+\cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
 cd /root/zsky
 #启动后端gunicorn+gevent,开启日志并在后台运行
@@ -84,16 +84,16 @@ git clone https://github.com/wenguonideshou/sphinx-jieba.git
 cd sphinx-jieba
 git submodule update --init --recursive
 ./configure --prefix=/usr/local/sphinx-jieba
-cp -r cppjieba/include/cppjieba src/ 
-cp -r cppjieba/deps/limonp src/ 
+\cp -r cppjieba/include/cppjieba src/ 
+\cp -r cppjieba/deps/limonp src/ 
 make install
-cp -r cppjieba/dict/* /usr/local/sphinx-jieba/etc/ 
+\cp -r cppjieba/dict/* /usr/local/sphinx-jieba/etc/ 
 cd /usr/local/sphinx-jieba/
-cp etc/jieba.dict.utf8 etc/xdictjieba.dict.utf8
-cp etc/user.dict.utf8 etc/xdictuser.dict.utf8
-cp etc/hmm_model.utf8 etc/xdicthmm_model.utf8
-cp etc/idf.utf8 etc/xdictidf.utf8
-cp etc/stop_words.utf8 etc/xdictstop_words.utf8
+\cp etc/jieba.dict.utf8 etc/xdictjieba.dict.utf8
+\cp etc/user.dict.utf8 etc/xdictuser.dict.utf8
+\cp etc/hmm_model.utf8 etc/xdicthmm_model.utf8
+\cp etc/idf.utf8 etc/xdictidf.utf8
+\cp etc/stop_words.utf8 etc/xdictstop_words.utf8
 systemctl start indexer	
 systemctl enable indexer
 systemctl start searchd	
