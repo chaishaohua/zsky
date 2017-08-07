@@ -113,7 +113,7 @@ class Search_Keywords(db.Model):
     id = db.Column(db.Integer,primary_key=True,nullable=False,autoincrement=True)
     keyword = db.Column(db.String(20),nullable=False,unique=True)
     order = db.Column(db.Integer,nullable=False)
-    pic = db.Column(db.String(255),nullable=False)
+    pic = db.Column(db.String(100),nullable=False)
     score = db.Column(db.String(10),nullable=False)
 
 class Search_Tags(db.Model):
