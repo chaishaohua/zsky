@@ -4,9 +4,7 @@ yum -y install git
 
 git  clone https://github.com/wenguonideshou/zsky.git
 
-cd zsky
-
-sh zsky.sh
+cd zsky&&sh zsky.sh
 
 此一键包只在centos7系统有效
 
@@ -18,6 +16,10 @@ sh zsky.sh
 Q：怎么限制/提高爬取速度？
 
 A：修改simdht_worker.py里的max_node_qsize=后面的数字，越大爬取越快，越小爬取越慢
+
+Q：觉得数据库空密码不安全，怎么修改数据库密码？
+
+A：执行mysqladmin -uroot -p password 123456!@#$%^      //将提示输入当前密码，直接回车即可，123456!@#$%^是新密码
 
 Q：修改数据库密码后怎么修改程序里的配置？
 
@@ -39,9 +41,21 @@ Q：如何查看索引是否成功？
 
 A：执行 systemstl status indexer 可以看到索引记录
 
+Q：觉得索引速度有点慢，怎么加快？
+
+A：修改sphinx.conf里面的mem_limit = 512M ，根据你的主机的内存使用情况来修改，越大索引越快
+
 Q：想确定搜索进程是否正常运行
 
 A：执行 systemctl status searchd ，如果是绿色的running说明搜索进程完全正常
+
+Q：发现又升级了，想重装，直接安装新版本，如果备份数据库？
+
+A：执行 mysqldump -uroot -p zsky>/root/zsky.sql  导出数据库  //将提示输入当前密码，直接回车即可，数据库导出后存在/root/zsky.sql
+
+Q：数据库备份后，现在重新安装了程序，如何导入旧数据？
+
+A：执行 mysql -uroot -p zsky</root/zsky.sql       //假设你的旧数据库文件是/root/zsky.sql，将提示输入当前密码，直接回车即可
 
 Q：我以前使用的搜片大师/手撕包菜，可以迁移过来吗？
 
@@ -51,4 +65,9 @@ Q：网站经常收到版权投诉，有没有好的解决办法？
 
 A：除了删除投诉的影片数据外，你可以使用前段Nginx、后端gunicorn+爬虫+数据库+索引的模式，甚至多前端模式。如果有需要，请联系作者QQ 153329152 付费为你提供服务
 
+Q：我觉得这程序非常垃圾，怎么卸载？
+
+A：执行 mysql -uroot -p //将提示输入密码，输入后进入mysql管理界面，执行 drop database zsky;  （注意必须带分号)这样就删除了数据库，然后执行 rm -rf /root/zsky 就成功卸载此程序了
+
 如果还有疑问 加入QQ群：253524174 获取解决办法
+
