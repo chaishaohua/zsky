@@ -41,7 +41,7 @@ A：在数据量变大后，索引将占用CPU 100%，非常影响用户访问�
 
 Q：如何查看索引是否成功？
 
-A：执行 systemstl status indexer 可以看到索引记录
+A：执行 systemctl status indexer 可以看到索引记录
 
 Q：觉得索引速度有点慢，怎么加快？
 
