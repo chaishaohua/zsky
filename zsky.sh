@@ -40,6 +40,7 @@ echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install psmisc net-tools lsof epel-release
+yum -y install git
 yum -y install python-pip
 yum -y install redis
 pip install -r requirements.txt
@@ -48,12 +49,11 @@ pip install -r requirements.txt
 #wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 #yum clean metadata
 #yum makecache
-yum -y install git 
 cd /root/zsky
 mkdir /root/zsky/uploads
-cp systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
+\cp -rpf systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
 systemctl daemon-reload	
-cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
+\cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
 systemctl start redis.service
