@@ -214,13 +214,14 @@ def search_results(query=None):
     curr.execute(countsql)
     resultcounts=curr.fetchall()
     counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
     curr.close()
     conn.close()
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
     form.search.data=query
-    return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 
 @app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
@@ -244,13 +245,14 @@ def search_results_bylength(query):
     curr.execute(countsql)
     resultcounts=curr.fetchall()
     counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
     curr.close()
     conn.close()
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
     form.search.data=query
-    return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 
 @app.route('/main-search-kw-<query>-px-3.html',methods=['GET','POST'])
@@ -274,13 +276,14 @@ def search_results_bycreate_time(query):
     curr.execute(countsql)
     resultcounts=curr.fetchall()
     counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
     curr.close()
     conn.close()
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
     form.search.data=query
-    return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 @app.route('/main-search-kw-<query>-px-4.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
@@ -303,13 +306,14 @@ def search_results_byrequests(query):
     curr.execute(countsql)
     resultcounts=curr.fetchall()
     counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
     curr.close()
     conn.close()
     pages=(counts+19)/20
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
     form=SearchForm()
     form.search.data=query
-    return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,tags=tags)
+    return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 @app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
@@ -467,6 +471,7 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
+#admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
 admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
