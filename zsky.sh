@@ -106,6 +106,7 @@ echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
 echo "systemctl start  gunicorn.service" >> /etc/rc.d/rc.local
 echo "systemctl start  indexer.service" >> /etc/rc.d/rc.local
 echo "systemctl start  searchd.service" >> /etc/rc.d/rc.local
+echo "cd /root/zsky" >> /etc/rc.d/rc.local
 echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.d/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
 #设置计划任务,每天早上5点进行主索引
