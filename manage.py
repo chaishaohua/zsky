@@ -4,6 +4,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import base64
+import json
 import codecs
 import time
 import os
@@ -184,6 +186,9 @@ def todate_filter(s):
     return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
 app.add_template_filter(todate_filter,'todate')
 
+def tothunder_filter(magnet):
+    return base64.b64encode('AA'+magnet+'ZZ')
+app.add_template_filter(tothunder_filter,'tothunder')
 
 @app.route('/search',methods=['GET','POST'])
 def search():
@@ -206,7 +211,7 @@ def search_results(query=None):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=1000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=5000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -315,13 +320,13 @@ def search_results_byrequests(query):
     form.search.data=query
     return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
-@app.route('/main-show-id-<id>-dbid-0.html',methods=['GET','POST'])
+@app.route('/hash/<info_hash>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def detail(id):
+def detail(info_hash):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE id=%s'
-    curr.execute(querysql,int(id))
+    querysql='SELECT * FROM film WHERE info_hash=%s'
+    curr.execute(querysql,info_hash)
     result=curr.fetchone()
     curr.close()
     conn.close()
