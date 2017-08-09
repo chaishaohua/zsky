@@ -10,7 +10,6 @@ import codecs
 import time
 import os
 import datetime
-#import logging
 from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
 from flask_login import LoginManager,UserMixin,current_user,login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
@@ -33,7 +32,6 @@ import pymysql
 #from flask_debugtoolbar import DebugToolbarExtension
 
 file_path = os.path.join(os.path.dirname(__file__), 'uploads')
-# Initialize Flask and set some config values
 app = Flask(__name__)
 app.config['DEBUG']=True
 app.config['SECRET_KEY'] = 'super-secret'
@@ -156,6 +154,7 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
+
 @loginmanager.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -242,7 +241,7 @@ def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=5000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -273,7 +272,7 @@ def search_results_bycreate_time(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=5000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -303,7 +302,7 @@ def search_results_byrequests(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=5000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -426,7 +425,6 @@ class HashView(ModelView):
     edit_modal = True
     can_export = True
     column_searchable_list = ['name']
-    page=1
     def get_list(self, *args, **kwargs):
         count, data = super(HashView, self).get_list(*args, **kwargs)
         count=100
@@ -476,7 +474,7 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
-#admin = Admin(app,name='管理中心',index_view=MyAdminIndexView(),template_mode='bootstrap2',base_template='admin/my_master.html')
+
 admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
