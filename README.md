@@ -15,6 +15,11 @@ cd zsky&&sh zsky.sh
 后台地址 http://IP/admin
 
 
+
+Q：如何给首页的推荐影片添加图片、评分？
+
+A：后台-文件管理-上传图片（图片名不能重复）,后台-首页推荐-新建，在“图片”选项中输入/uploads/图片地址 ， 以及片名、评分、显示顺序 ,  在templates/index.html里调用{{k.pic}}代表图片地址,{{k.score}}代表影片评分
+
 Q：怎么限制/提高爬取速度？
 
 A：修改simdht_worker.py里的max_node_qsize=后面的数字，越大爬取越快，越小爬取越慢
