@@ -67,13 +67,13 @@ A：执行 mysqldump -uroot -p zsky>/root/zsky.sql  导出数据库  //将提�
 
 A：执行 mysql -uroot -p zsky</root/zsky.sql       //假设你的旧数据库文件是/root/zsky.sql，将提示输入当前密码，直接回车即可
 
-**Q：怎么修改搜索结果数量 默认1000条太少了**
+**Q：怎么修改搜索结果数量，默认1000条太少了**
 
 A：修改manage.py里的max_matches=1000
 
 **Q：sitemap数量默认是100太少了，怎么修改？**
 
-A：修改manage.py里的sql语句 'SELECT id,create_time FROM film order by create_time desc limit 100' 里的数量
+A：修改manage.py里的sql语句 'SELECT info_hash,create_time FROM film order by create_time desc limit 100' 里的数量
 
 **Q：我以前使用的搜片大师/手撕包菜，可以迁移过来吗？**
 
