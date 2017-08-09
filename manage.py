@@ -32,6 +32,7 @@ import pymysql
 #from flask_debugtoolbar import DebugToolbarExtension
 
 file_path = os.path.join(os.path.dirname(__file__), 'uploads')
+# Initialize Flask and set some config values
 app = Flask(__name__)
 app.config['DEBUG']=True
 app.config['SECRET_KEY'] = 'super-secret'
@@ -154,7 +155,6 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
-
 @loginmanager.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -241,7 +241,7 @@ def search_results_bylength(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=5000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -272,7 +272,7 @@ def search_results_bycreate_time(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=5000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -302,7 +302,7 @@ def search_results_byrequests(query):
     page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=5000'
+    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000'
     curr.execute(querysql,[query,(page-1)*20])
     result=curr.fetchall()
     #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
@@ -342,16 +342,16 @@ def detail(info_hash):
 def sitemap():    
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
-    querysql='SELECT info_hash,create_time FROM film order by create_time desc limit 100'
+    querysql='SELECT id,create_time FROM film order by create_time desc limit 100'
     curr.execute(querysql)
     rows=curr.fetchall()
     curr.close()
     conn.close()
     sitemaplist=[]
     for row in rows:
-        info_hash = row['info_hash']
+        id = row['id']
         mtime = datetime.datetime.fromtimestamp(int(row['create_time'])).strftime('%Y-%m-%d')
-        url = request.url_root+'hash/{}.html'.format(info_hash)
+        url = request.url_root+'main-show-id-{}-dbid-0.html'.format(id)
         url_xml = '<url><loc>{}</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(url, mtime)
         sitemaplist.append(url_xml)
     xml_content = '<?xml version="1.0" encoding="UTF-8"?><urlset>{}</urlset>'.format("".join(x for x in sitemaplist))
@@ -427,8 +427,7 @@ class HashView(ModelView):
     column_searchable_list = ['name']
     def get_list(self, *args, **kwargs):
         count, data = super(HashView, self).get_list(*args, **kwargs)
-        count=100
-        data=Search_Hash.query.order_by(Search_Hash.id.desc()).limit(20)
+        count=10000
         return count,data
     def is_accessible(self):
         if current_user.is_authenticated :
@@ -473,7 +472,6 @@ class UserView(ModelView):
         return False
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
-
 
 admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
