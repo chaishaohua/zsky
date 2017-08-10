@@ -60,31 +60,12 @@ apt-get -y install git libmysqlclient-dev
 apt-get -y install python-pip
 apt-get -y install redis-server
 pip install -r requirements.txt
-#如果提示没有pip命令,或者你使用linode的主机,请取消下面4行的注释
-#wget -O /etc/apt-get.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-#wget -qO /etc/apt-get.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-#apt-get clean metadata
-#apt-get makecache
 cd /root/zsky
 mkdir /root/zsky/uploads
 \cp -rpf systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
 \cp -rpf systemctl/gunicorn_du.service  /etc/systemd/system/gunicorn.service
-[Unit]
-Description=gunicorn daemon
-After=network.target
-
-[Service]
-User=root
-Group=root
-WorkingDirectory=/root/zsky
-ExecStart=/usr/local/bin/gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4
-ExecReload=/bin/kill -s HUP $MAINPID  
-ExecStop=/bin/kill -s QUIT $MAINPID 
-
-[Install]
-WantedBy=multi-user.target
 systemctl daemon-reload	
-\cp my_debian.cnf /etc/mysql/my.cnf
+\cp my_du.cnf /etc/mysql/my.cnf
 systemctl start  mysql.service 
 systemctl enable mysql.service
 systemctl start redis-server.service
