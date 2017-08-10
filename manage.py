@@ -185,6 +185,10 @@ def todate_filter(s):
     return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
 app.add_template_filter(todate_filter,'todate')
 
+def fromjson_filter(s):
+    return json.loads(s)
+app.add_template_filter(fromjson_filter,'fromjson')
+
 def tothunder_filter(magnet):
     return base64.b64encode('AA'+magnet+'ZZ')
 app.add_template_filter(tothunder_filter,'tothunder')
@@ -473,12 +477,21 @@ class UserView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
+class FileManager(FileAdmin):
+    def is_accessible(self):
+        if current_user.is_authenticated :
+            return True
+        return False
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('admin.login_view'))
+
+
 admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
 admin.add_view(UserView(Search_Statusreport, db.session,name='爬取统计'))
-admin.add_view(FileAdmin(file_path, '/uploads/', name='文件管理'))
+admin.add_view(FileManager(file_path, '/uploads/', name='文件管理'))
 admin.add_view(UserView(User, db.session,name='用户管理'))
 
 
