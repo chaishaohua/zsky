@@ -1,5 +1,19 @@
 #!/bin/sh
 #By 我本戏子 2017.7
+if [ $(id -u) != "0" ]; then
+    echo "当前非root用户登录系统， 请使用root用户运行此脚本!"
+    exit 1
+fi
+grep SwapTotal /proc/meminfo
+if [ $? -ne 0 ]
+then
+	echo "主机没有swap, 将自动创建swap"
+	fallocate -l 1G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile
+	swapon /swapfile
+	echo '/swapfile   swap    swap    sw  0   0' >> /etc/fstab
+fi
 \cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
@@ -99,16 +113,16 @@ systemctl enable indexer
 systemctl start searchd	
 systemctl enable searchd
 #开机自启动
-chmod +x /etc/rc.d/rc.local
-echo "systemctl start  mariadb.service" >> /etc/rc.d/rc.local
-echo "systemctl start  redis.service" >> /etc/rc.d/rc.local
-echo "systemctl start  nginx.service" >> /etc/rc.d/rc.local
-echo "systemctl start  gunicorn.service" >> /etc/rc.d/rc.local
-echo "systemctl start  indexer.service" >> /etc/rc.d/rc.local
-echo "systemctl start  searchd.service" >> /etc/rc.d/rc.local
-echo "cd /root/zsky" >> /etc/rc.d/rc.local
-echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.d/rc.local
-echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
+chmod +x /etc/rc.local
+echo "systemctl start  mariadb.service" >> /etc/rc.local
+echo "systemctl start  redis.service" >> /etc/rc.local
+echo "systemctl start  nginx.service" >> /etc/rc.local
+echo "systemctl start  gunicorn.service" >> /etc/rc.local
+echo "systemctl start  indexer.service" >> /etc/rc.local
+echo "systemctl start  searchd.service" >> /etc/rc.local
+echo "cd /root/zsky" >> /etc/rc.local
+echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
