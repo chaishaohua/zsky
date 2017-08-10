@@ -82,7 +82,7 @@ nohup python simdht_worker.py >/root/zsky/spider.log 2>&1&
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/wenguonideshou/sphinx-jieba.git
 cd sphinx-jieba
-git submodule update --init --recursive
+git clone https://github.com/wenguonideshou/cppjieba.git
 ./configure --prefix=/usr/local/sphinx-jieba
 \cp -r cppjieba/include/cppjieba src/ 
 \cp -r cppjieba/deps/limonp src/ 
