@@ -67,7 +67,22 @@ pip install -r requirements.txt
 #apt-get makecache
 cd /root/zsky
 mkdir /root/zsky/uploads
-\cp -rpf systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
+\cp -rpf systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
+\cp -rpf systemctl/gunicorn_du.service  /etc/systemd/system/gunicorn.service
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/zsky
+ExecStart=/usr/local/bin/gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4
+ExecReload=/bin/kill -s HUP $MAINPID  
+ExecStop=/bin/kill -s QUIT $MAINPID 
+
+[Install]
+WantedBy=multi-user.target
 systemctl daemon-reload	
 \cp my_debian.cnf /etc/mysql/my.cnf
 systemctl start  mysql.service 
