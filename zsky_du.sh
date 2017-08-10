@@ -13,7 +13,6 @@ then
 	mkswap /swapfile
 	swapon /swapfile
 	echo '/swapfile   swap    swap    sw  0   0' >> /etc/fstab
-	exit 1
 fi
 \cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
 systemctl stop firewalld.service  
