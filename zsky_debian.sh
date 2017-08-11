@@ -111,7 +111,7 @@ systemctl start searchd
 systemctl enable searchd
 #开机自启动
 chmod +x /etc/rc.local
-echo "systemctl start  mariadb.service" >> /etc/rc.local
+echo "systemctl start  mysql.service" >> /etc/rc.local
 echo "systemctl start  redis.service" >> /etc/rc.local
 echo "systemctl start  nginx.service" >> /etc/rc.local
 echo "systemctl start  gunicorn.service" >> /etc/rc.local
