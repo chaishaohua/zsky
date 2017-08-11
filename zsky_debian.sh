@@ -62,7 +62,7 @@ pip install -r requirements.txt
 cd /root/zsky
 mkdir /root/zsky/uploads
 \cp -rpf systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
-\cp -rpf systemctl/gunicorn_du.service  /etc/systemd/system/gunicorn.service
+\cp -rpf systemctl/gunicorn_debian.service  /etc/systemd/system/gunicorn.service
 systemctl daemon-reload	
 \cp my_debian.cnf /etc/mysql/my.cnf
 mysql_secure_installation
