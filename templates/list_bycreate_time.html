@@ -32,9 +32,9 @@
 </div>
 <div id="sort-bar">
 <a href="#"><b>创建时间</b></a>
-<a href="{{url_for('search_results_bylength',query=query)}}">文件大小</a>
-<a href="{{url_for('search_results',query=query)}}">相关度</a>
-<a href="{{url_for('search_results_byrequests',query=query)}}">热度</a>
+<a href="{{url_for('search_results_bylength',query=query,page=1)}}">文件大小</a>
+<a href="{{url_for('search_results',query=query,page=1)}}">相关度</a>
+<a href="{{url_for('search_results_byrequests',query=query,page=1)}}">热度</a>
 </div>
 <div id="content">
 <div id="wall">
@@ -113,7 +113,7 @@
 <div id="latest-search" class="sidebar-width">
 <span class="latest-desc">大家对这些感兴趣：</span>
 {%for tag in tags%}
-<span><a href="{{url_for('search_results',query=tag.tag)}}">{{tag.tag}}</a></span>
+<span><a href="{{url_for('search_results',query=tag.tag,page=1)}}">{{tag.tag}}</a></span>
 {%endfor%}
 </div>
 </div>
