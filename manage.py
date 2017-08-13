@@ -198,12 +198,12 @@ def search():
     form=SearchForm()
     if not form.search.data:
         return redirect(url_for('index'))
-    return redirect(url_for('search_results',query=form.search.data))
+    return redirect(url_for('search_results',query=form.search.data,page=1))
 
 
-@app.route('/main-search-kw-<query>.html',methods=['GET','POST'])
+@app.route('/main-search-kw-<query>-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results(query=None):
+def search_results(query,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
@@ -211,7 +211,7 @@ def search_results(query=None):
     connzsky.commit()
     currzsky.close()
     connzsky.close()
-    page=request.args.get('page',1,type=int)
+    #page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=5000'
@@ -232,9 +232,9 @@ def search_results(query=None):
     return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 
-@app.route('/main-search-kw-<query>-px-2.html',methods=['GET','POST'])
+@app.route('/main-search-kw-<query>-length-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_bylength(query):
+def search_results_bylength(query,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
@@ -242,7 +242,7 @@ def search_results_bylength(query):
     connzsky.commit()
     currzsky.close()
     connzsky.close()
-    page=request.args.get('page',1,type=int)
+    #page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000'
@@ -263,9 +263,9 @@ def search_results_bylength(query):
     return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 
-@app.route('/main-search-kw-<query>-px-3.html',methods=['GET','POST'])
+@app.route('/main-search-kw-<query>-time-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_bycreate_time(query):
+def search_results_bycreate_time(query,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
@@ -273,7 +273,7 @@ def search_results_bycreate_time(query):
     connzsky.commit()
     currzsky.close()
     connzsky.close()
-    page=request.args.get('page',1,type=int)
+    #page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000'
@@ -293,9 +293,9 @@ def search_results_bycreate_time(query):
     form.search.data=query
     return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
-@app.route('/main-search-kw-<query>-px-4.html',methods=['GET','POST'])
+@app.route('/main-search-kw-<query>-requests-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_byrequests(query):
+def search_results_byrequests(query,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     currzsky = connzsky.cursor()
     taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
@@ -303,7 +303,7 @@ def search_results_byrequests(query):
     connzsky.commit()
     currzsky.close()
     connzsky.close()
-    page=request.args.get('page',1,type=int)
+    #page=request.args.get('page',1,type=int)
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000'
@@ -380,6 +380,8 @@ def notfound(e):
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
+        if not current_user.is_authenticated:
+            return redirect(url_for('admin.login_view'))
         connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
         currzsky = connzsky.cursor()
         totalsql = 'select count(id) from search_hash'
@@ -399,8 +401,6 @@ class MyAdminIndexView(AdminIndexView):
             os.mknod(logfile)
             body = codecs.open(logfile, 'r',encoding='utf-8' , errors='ignore').readlines()[-20:]
         htmlbody = '\n'.join('<p>%s</p>' % line for line in body)
-        if not current_user.is_authenticated:
-            return redirect(url_for('admin.login_view'))
         return self.render('admin/index.html',total=total,today=today,htmlbody=htmlbody)
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
