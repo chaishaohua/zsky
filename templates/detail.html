@@ -120,7 +120,7 @@
 <div class="panel-header">你可能喜欢</div>
 <div class="panel-body">
 {%for fenci in fenci_list%}
-<a href="{{url_for('search_results',query=fenci)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
+<a href="{{url_for('search_results',query=fenci,page=1)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
 {%endfor%}
 </div>
 </div>
