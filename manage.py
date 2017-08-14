@@ -4,6 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import re
 import base64
 import json
 import codecs
@@ -196,9 +197,10 @@ app.add_template_filter(tothunder_filter,'tothunder')
 @app.route('/search',methods=['GET','POST'])
 def search():
     form=SearchForm()
+    query=re.sub(r"(['`=\(\)|\-!@~\"&/\\\^\$])", r"\\\1", form.search.data)
     if not form.search.data:
         return redirect(url_for('index'))
-    return redirect(url_for('search_results',query=form.search.data,page=1))
+    return redirect(url_for('search_results',query=query,page=1))
 
 
 @app.route('/main-search-kw-<query>-<int:page>.html',methods=['GET','POST'])
