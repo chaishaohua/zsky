@@ -187,7 +187,10 @@ def todate_filter(s):
 app.add_template_filter(todate_filter,'todate')
 
 def fromjson_filter(s):
-    return json.loads(s)
+    try:
+        return json.loads(s)
+    except ValueError:
+        pass
 app.add_template_filter(fromjson_filter,'fromjson')
 
 def tothunder_filter(magnet):
