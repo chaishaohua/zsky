@@ -76,10 +76,16 @@
 </div>
 <div class="panel-body">
 <ol>
-<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">{% if hash['length']>1073741824 %}
+<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">
+{% if hash['length']>1073741824 %}
 {{(hash['length']/1073741824)|round(2)}}G
 {% else %}{{(hash['length']/1048576)|round(2)}}M
-{%endif%}</span></li>
+{%elif hash['length']>1024%}
+{{(hash['length']/1024)|round(2)}}K
+{%else%}
+{{hash['length']}}字节
+{%endif%}
+</span></li>
 </ol>
 </div>
 </div>
@@ -93,23 +99,33 @@
 <ul>
 {% if hash['file_list'] and hash['file_list']|fromjson !=none %}
 {%for f in hash['file_list']|fromjson%}
-{%if f['length']>1048576%}
 <li>{{f['path']}}&nbsp;<span class="cpill blue-pill">
 {%if f['length']>1073741824%}
 {{(f['length']/1073741824)|round(2)}}G
 {%elif f['length']>1048576%}
 {{(f['length']/1048576)|round(2)}}M
+{%elif hash['length']>1024%}
+{{(hash['length']/1024)|round(2)}}K
+{%else%}
+{{hash['length']}}字节
 {%endif%}
 </span></li>
 {%else%}
 {%endif%}
 {% endfor %}
+
 {% else %}
-<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">{% if hash['length']>1073741824 %}
+<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">
+{% if hash['length']>1073741824 %}
 {{(hash['length']/1073741824)|round(2)}}G
 {% else %}{{(hash['length']/1048576)|round(2)}}M
-{%endif%}</span></li>
-{% endif  %}
+{%elif hash['length']>1024%}
+{{(hash['length']/1024)|round(2)}}K
+{%else%}
+{{hash['length']}}字节
+{%endif%}
+</span></li>
+{% endif %}
 </ul>
 </div>
 </div>
