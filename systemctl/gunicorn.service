@@ -6,7 +6,7 @@ After=network.target
 User=root
 Group=root
 WorkingDirectory=/root/zsky
-ExecStart=/usr/bin/gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log  manage:app -b 127.0.0.1:8000 -w 4
+ExecStart=/usr/bin/gunicorn -k gevent --access-logfile zsky.log --error-logfile zsky_err.log --access-logformat '%({X-Real-IP}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' manage:app -b 127.0.0.1:8000 -w 4
 ExecReload=/bin/kill -s HUP $MAINPID  
 ExecStop=/bin/kill -s QUIT $MAINPID 
 
