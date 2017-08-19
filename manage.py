@@ -433,7 +433,7 @@ class HashView(ModelView):
     create_modal = True
     edit_modal = True
     can_export = True
-    column_searchable_list = ['hash']
+    column_searchable_list = ['info_hash']
     def get_list(self, *args, **kwargs):
         count, data = super(HashView, self).get_list(*args, **kwargs)
         count=10000
