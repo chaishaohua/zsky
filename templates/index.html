@@ -1,64 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="baidu-site-verification" content="P1QzNDXk6x"/>
-<meta charset="utf-8"/>
-<title>纸上烤鱼 - 种子搜索网站,最快的磁力链接搜索引擎</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="纸上烤鱼种子搜索神器,一个有兔子般速度的种子搜索网站,为您提供高效精准的磁力链接搜索服务!"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="apple-touch-icon" href="{{ url_for('static', filename='ciliss_apple.jpg') }}"/>
-
-</head>
-<body>
-<div id="wrapper">
-<div class="top-bar"><span class="first"><a href="/">种子搜索</a></span>
-<select autocomplete="off" onchange="changeLanguage(this.value)">
-<option value="KR">한국어</option>
-<option value="EN">English</option>
-<option value="JP">日本語</option>
-<option value="CN" selected>简体中文</option>
-<option value="HK">繁體中文</option>
-</select>
-</div>
-<div id="first-content">
-<div id="center-box-wrapper">
-<div id="center-box">
-<div id="center-logo">
-<a href="/"><img src="{{ url_for('static', filename='logo.png') }}" alt="纸上烤鱼"/></a>
-<p><h1>纸上烤鱼-最快的磁力链接搜索引擎</h1></p>
-</div>
-<div id="search-box">
-<form id="search-form" action="{{url_for('search')}}" method="POST">
+ <head> 
+  <meta http-equiv="Cache-Control" content="no-transform " />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+    <title>Btbook - DHT Magnet Search</title>
+    <meta name="keywords" content="Magnetic search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search Search engine, seed search, BT search search, BT search, magnetic search, magnetic chain, magnetic link search, magnetic link search engine, Thunder download">
+    <meta name="description" content="a simple DHT research website." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> 
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico"/>
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico"/>
+  <!--<link type="text/css" rel="stylesheet" href="//dg12.qiniudn.com/bt.css" />-->
+  <link type="text/css" rel="stylesheet" href="//css.315g.cn/bt.css" />
+ </head> 
+{%include'head.html'%}
+    <div class="searchbox">
+      <form action="{{url_for('search',category=0,page=1)}}" name="search" id="searchFrom" method="POST"  >
+  <div class="search">
 {{form.hidden_tag()}}
-{{form.search(id="search")}}
-{{form.submit(class="blue",id="btnSearch")}}
-</form>
-<div class="info-box">
-<ul>
-{%for k in keywords%}
-<li><a href="{{url_for('search_results',query=k.keyword,page=1)}}">{{k.keyword}}</a></li>
-{%endfor%}
-</ul>
-<p style="color:#000000; margin-top:10px;">总收录{{total}}条数据</p>
+          <div class="sbtn"><button value="磁力搜索" type="submit" >磁力搜索</button></div>
+<div class="wd" >
+{{form.search(id="search",placeholder="输入关键词搜索BT种子...",autocomplete = "on" ,autofocus="autofocus")}}
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="push"></div>
-</div>
-<div class="footer">
-<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
-</div>
-<script charset="gbk" type="text/javascript" src="http://www.baidu.com/js/opensug.js"></script>
-<script type="text/javascript">
-             var params = { "XOffset": 0, "YOffset": 0, "fontColor": "#444", "fontColorHI": "#000", "fontSize": "16px", "fontFamily": "arial", "borderColor": "gray", "bgcolorHI": "#ebebeb", "sugSubmit": false };BaiduSuggestion.bind("search", params);
-       </script>
+        </div>
+      </form>
+    </div>
+<div class="f16 mt15 mb15">When boring, come<b>Btbook - DHT Magnet Search</b>Looking for the latest film, TV, music, game solution bored! :-)</div>
+    <div class="addthis_inline_share_toolbox_fkn6"></div>
+      <span class="red f14">btbook Due to the huge amount of visits, the relevant departments of harmony, the technical department of the emergency purchase of a number of anti-jump domain name, please click to view <a href="http://www.026001.cn/" target="_blank"><b>btbooK List of anti - jumps</b></a>^_^</span>
+    <div class="tbox"> 
+          <div class="ssbox"> 
+            <div class="title"> <h3><span class="f14">Btbook - DHT Magnet Search popular searches</span></h3> </div> 
+            <div class="rms">
+            {%for k in keywords%}
+            <span><a href="{{url_for('search_results',query=k.keyword,category=0,order=0,page=1)}}"><b>{{k.keyword}}</b></a></span>
+            {%endfor%}
+            </div> 
+          </div> 
+        </div>
+<span class="f14" ><strong><span style="color: #ff0000;">Tips: press at the same time<span style="background-color: #ff6600; color: #ffffff;">Ctrl+D</span>Can quickly add this site to the Favorites!</span></strong></span></div>
+  </div>
+{%include'footer.html'%}
 </body>
 </html>
-

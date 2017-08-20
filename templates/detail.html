@@ -1,166 +1,157 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8"/>
-<title>{{hash['name'].encode('utf8')}} - 纸上烤鱼,磁力链接,磁力搜索</title>
-<meta name="keywords" content=""/>
-<meta name="description" content="电影种子,磁力链接,迅雷链接,BT下载,尽在纸上烤鱼"/>
-<meta name="viewport" content="width=device-width"/>
-<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='default.css') }}"/>
-<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
-</head>
-<body>
-<div id="wrapper">
-<div class="top-bar"><span class="first"><a href="/">种子搜索</a></span>
-<select autocomplete="off" onchange="changeLanguage(this.value)">
-<option value="KR">한국어</option>
-<option value="EN">English</option>
-<option value="JP">日本語</option>
-<option value="CN" selected>简体中文</option>
-<option value="HK">繁體中文</option>
-</select>
-</div>
-<div class="header-div">
-<form class="search-form"  action="{{url_for('search')}}" method="POST">
-<a href="/" ><img src="{{url_for('static',filename='logo_s.png')}}"  class="nav-logo"/></a>
-{{form.hidden_tag()}}
-{{form.search(id="search")}}
-{{form.submit(class="blue",id="btnSearch")}}
-</form>
-</div>
+ <head> 
+  <meta http-equiv="Cache-Control" content="no-transform " />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <meta name="description" content="{{hash.name}}of the latest information, {{hash.name}}free download, {{hash.name}}btdownload free seed, {{hash.name}}Blu ray HD, while providing {%for k in randkeywords%}{{k.keyword}}，{%endfor%},such as Baidu and major TV Golden theater hot film BT QQ magnetic cyclone offline, thunder offline, Baidu cloud disk offline download soso provide links and BT magnetic force seeds under load">
+  <title>{{hash.name}}free download, Blu ray, magnetic - Search Search for the latest Torrent resources up to the best magnetic the most powerful search engine, while providing {%for k in randkeywords%}{{k.keyword}}，{%endfor%}, Baidu and other major television popular TV Golden theater BT magnetic QQ cyclone offline, thunder offline, Baidu cloud disk offline download soso provide links and magnetic force BT seeds.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> 
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico"/>
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico"/>
+  <!--<link type="text/css" rel="stylesheet" href="//dg12.qiniudn.com/bt.css" />-->
+  <link type="text/css" rel="stylesheet" href="//css.315g.cn/bt.css" />
+ </head> 
+ {%include'head.html'%}
+    <div class="searchbox">
+      <form action="{{url_for('search',query=query,page=1)}}" name="search" id="searchFrom" method="post" onsubmit="return submitForm(this);" >
+        <div class="search">
+    {{form.hidden_tag()}}
+          <div class="sbtn"><button value="Magnetic search" type="submit" >search</button></div>
+<div class="wd" >
+{{form.search(id="search",placeholder="Enter keyword search for BT seed ...",autocomplete = "on" ,autofocus="autofocus")}}   
+    </div>
+      </form>
+    </div>
+     <div class="bt_title"><h2>{{hash['name'].encode('utf8')}}</h2></div>
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Magnetic link / BT seed name</h3></div>
+        <div class="content">
+<b>{{hash['name'].encode('utf8')}}</b>
+        </div>
+      </div>
+    </div>
 
-<div id="content">
-<div id="wall">
-<h2>{{hash['name'].encode('utf8')}}</h2>
-<div class="detail-panel detail-width">
-<table class="detail-table detail-width">
-<tbody>
-<tr class="detail-header-bg">
-<th>文件类型</th>
-<th>创建时间</th>
-<th>热度</th>
-<th>文件大小</th>
-</tr>
-<tr>
-<td>{{hash['category']}}</td>
-<td>{{hash['create_time']|todate}}</td>
-<td>{{hash['requests']}}</td>
-<td>
-{% if hash['length']>1073741824 %}
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Magnetic Link / BT Seed Profile</h3></div>
+        <div class="content">
+Hash:{{hash['info_hash']}}<br />
+Size：<b>{% if hash['length']>1073741824 %}
 {{(hash['length']/1073741824)|round(2)}}G
 {% else %}{{(hash['length']/1048576)|round(2)}}M
-{%endif%}
-</td>
-</tr>
-</tbody>
-</table>
-<div class="detail-panel detail-width">
-<div class="panel-header">磁力链接</div>
-<div class="panel-body">
-<a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}">magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}</a>
-</div>
-</div>
-<div class="detail-panel detail-width">
-<div class="panel-header">迅雷下载</div>
-<div class="panel-body">
-<div id="xlurl">
-{% set magneturl=("magnet:?xt=urn:btih:"~hash['info_hash'] | upper) %}
-<a href="thunder://{{magneturl|tothunder}}">thunder://{{magneturl|tothunder}}</a>
-</div>
-</div>
-</div>
-
-<div class="detail-panel detail-width">
-<div class="panel-header">
-伪文件列表
-</div>
-<div class="panel-body">
-<ol>
-<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">
-{% if hash['length']>1073741824 %}{{(hash['length']/1073741824)|round(2)}}G
-{% elif hash['length']>1048576 %}{{(hash['length']/1048576)|round(2)}}M
-{% elif hash['length']>1024 %}{{(hash['length']/1024)|round(2)}}K
-{% else %}{{hash['length']}}字节
-{% endif %}
-</span></li>
-</ol>
-</div>
-</div>
-
-        
-<div class="detail-panel detail-width">
-<div class="panel-header">
-真文件列表
-</div>
-<div class="panel-body">
-<ul>
-{% if hash['file_list'] and hash['file_list']|fromjson !=none %}
-{% for f in hash['file_list']|fromjson %}
-<li>{{f['path']}}&nbsp;<span class="cpill blue-pill">
-{% if f['length']>1073741824 %}{{(f['length']/1073741824)|round(2)}}G
-{% elif f['length']>1048576 %}{{(f['length']/1048576)|round(2)}}M
-{% elif f['length']>1024 %}{{(f['length']/1024)|round(2)}}K
-{% else %}{{f['length']}}字节
-{%endif%}
-</span></li>
+{%endif%}</b> <br />
+                Has been downloaded：<b>{{hash['requests']}} Times</b><br />
+                Download speed：<b>100MB/s</b><br />
+                Collection time：<b>{{hash['create_time']|todate}}</b><br />
+                Recently Downloaded：<b>{{hash['last_seen']|todate}}</b>
+        </div>
+      </div>
+    </div>
+	
+	<div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>The world's senior line friends popular search list</h3>
+            </div>
+            <div class="slist2">
+              <ul>
+{%for k in randkeywords%}
+<a  class="like-word" href="{{url_for('search_results',query=k.keyword,category=0,order=0,page=1)}}">{{k.keyword}}</a>&nbsp;&nbsp;
 {% endfor %}
-
-{% else %}
-<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">
-{% if hash['length']>1073741824 %}{{(hash['length']/1073741824)|round(2)}}G
-{% elif hash['length']>1048576 %}{{(hash['length']/1048576)|round(2)}}M
-{% elif hash['length']>1024 %}{{(hash['length']/1024)|round(2)}}K
-{% else %}{{hash['length']}}字节
-{% endif %}
-</span></li>
-{% endif %}
 </ul>
-</div>
-</div>
+            </div>
+          </div>
+        </div>
+  
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Magnetic link Download</h3></div>
+        <div class="content">
+<a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" target="_blank" ><b>magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}</b></a>  
+        </div>
+          <div class="title"><h3>Thunderbolt link Download</h3></div>
+        <div class="content">
+{% set magneturl=("magnet:?xt=urn:btih:"~hash['info_hash'] | upper) %}
+<a href="thunder://{{magneturl|tothunder}}" target="_blank"><b>thunder://{{magneturl|tothunder}}</b></a>
+        </div>
+      </div>
+    </div>
 
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Download the BT seed file</h3></div>
+        <div class="content">
+<div class="down_btn">
+                <a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" target="_blank" class="btn btn-primary" >Magnet Url</a>
+                {% set magneturl=("magnet:?xt=urn:btih:"~hash['info_hash'] | upper) %}
+                <a href="thunder://{{magneturl|tothunder}}" target="_blank" class="btn btn-success" >Thunder Url</a>
+                <a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" target="_blank" class="btn btn-info" >QQ cyclonet Url</a>
+                <input  id="MagnetLink" type="hidden" value="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}">
+           <a href="http://vod.xunlei.com/mini.html?url=magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}" target="_blank" class="btn btn-danger">Thunder clouds</a>
+                <a href="javascript:;" onClick="start('magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}')" class="btn btn-success" >Thunder look</a>
+                <a href="http://pan.baidu.com/" target="_blank" class="btn btn-primary" >BaiDu Url</a>
+                </div>
+        </div>
+      </div>
+    </div>
 
-<div class="detail-panel detail-width">
-<div class="panel-header">你可能喜欢</div>
-<div class="panel-body">
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Recent search</h3></div>
+        <div class="content">
+            <div class="like">
+              <span>
+{%for tag in tags%}
+              <a class="like-word" href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}" target="_blank">{{tag.tag}}</a>      
+{% endfor %}
+              </span>
+        </div>
+      </div>
+    </div>
+</div>
+      
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>File List</h3>
+            </div>
+            <div class="slist2">
+              <ul>
+
+<li>{{hash.name}}&nbsp;<span class="cpill blue-pill">{% if hash['length']>1073741824 %}
+{{(hash['length']/1073741824)|round(2)}}G
+{% else %}{{(hash['length']/1048576)|round(2)}}M
+{%endif%}</span></li>
+</ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>You may be interested</h3>
+            </div>
+            <div class="slist2">
+              <ul>
 {%for fenci in fenci_list%}
-<a href="{{url_for('search_results',query=fenci,page=1)}}">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
-{%endfor%}
-</div>
-</div>
-<div class="detail-panel detail-width">
-<div class="panel-header">友情提示</div>
-<div class="panel-body">
-<p>{{hash.name}}</p>
-<p>本站已经屏蔽了99%的非法链接，若本链接侵犯你的权利，请联系下面的邮箱进行举报！ </p>
-<p>亲，你造吗？将网页分享给您的基友，下载的人越多速度越快哦！</p>
-</div>
-</div>
-<div class="detail-panel detail-width">
-<div class="panel-header">
-投诉异议
-</div>
-<div class="panel-body">
-<p>
-版权投诉/Complain Email：<a class="__cf_email__"  >hao123@hao123.com</a>
-</p>
-</div>
-</div>
-</div>
-<div class="push">
-</div>
-</div>
-</div>
-</div>
-<div class="footer">
-<span><a href="#">纸上烤鱼</a></span> | <span><a href="#">种子搜索</a></span> | <span><a href="#">磁力链接</a></span>
-</div>
+<a href="{{url_for('search_results',query=fenci,category=0,order=0,page=1)}}" target="_blank">{{fenci.encode('utf8')}}</a>&nbsp;&nbsp;
+{% endfor %}
+</ul>
+            </div>
+          </div>
+        </div>
 
-
-<script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>
-<script type="text/javascript">
-        var params = { "XOffset": 0, "YOffset": 0, "fontColor": "#444", "fontColorHI": "#000", "fontSize": "16px", "fontFamily": "arial", "borderColor": "gray", "bgcolorHI": "#ebebeb", "sugSubmit": false };
-        BaiduSuggestion.bind("search", params);
-    </script>
+    <div class="tbox">
+      <div class="ssbox">
+        <div class="title"><h3>Copyright reminder</h3></div>
+        <div class="content">
+<span class="grey f12">
+This site does not store any resource content, only collects BT seed metadata (such as file name and file size) and magnetic links (BT seed identifiers), and provides a query service that is a perfectly legitimate search engine system. The site does not provide seed download service, users can use third-party links or magnetic links to obtain the relevant seed resources. This site is not responsible for the authenticity and legitimacy of BT seeds, please note that users! Complaint E-mail: tousu@baidu.com</span>
+        </div></div>
+      </div></div>
+{%include'footer.html'%}
 </body>
 </html>
