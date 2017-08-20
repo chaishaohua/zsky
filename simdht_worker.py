@@ -52,8 +52,8 @@ TID_LENGTH = 2
 RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
-MAX_QUEUE_LT = 30
-MAX_QUEUE_PT = 2000
+MAX_QUEUE_LT = 300
+MAX_QUEUE_PT = 10000
 
 
 def entropy(length):
@@ -274,7 +274,7 @@ class Master(Thread):
         self.setDaemon(True)
         self.queue = Queue()
         self.metadata_queue = Queue()
-        self.pool = PooledDB(pymysql,50,host=DB_HOST,user=DB_USER,passwd=DB_PASS,db=DB_NAME,port=3306,charset="utf8mb4") #50为连接池里的最少连接数
+        self.pool = PooledDB(pymysql,100,host=DB_HOST,user=DB_USER,passwd=DB_PASS,db=DB_NAME,port=3306,charset="utf8mb4") #50为连接池里的最少连接数
         self.dbconn = self.pool.connection()
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8mb4')
@@ -379,6 +379,6 @@ if __name__ == "__main__":
     rpcthread.setDaemon(True)
     rpcthread.start()
 
-    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
+    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=1000000)
     dht.start()
     dht.auto_send_find_node()

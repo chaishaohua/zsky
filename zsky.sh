@@ -73,7 +73,7 @@ systemctl enable mariadb.service
 systemctl start redis.service
 systemctl enable redis.service
 mysql -uroot  -e"create database zsky default character set utf8mb4;"  
-mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 10000;" 
+mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 100000;" 
 #建表
 python manage.py init_db
 #按照提示输入管理员用户名、密码、邮箱
@@ -120,7 +120,8 @@ echo "systemctl start  nginx.service" >> /etc/rc.local
 echo "systemctl start  gunicorn.service" >> /etc/rc.local
 echo "systemctl start  indexer.service" >> /etc/rc.local
 echo "systemctl start  searchd.service" >> /etc/rc.local
-echo "nohup python /root/zsky/simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
+echo "cd /root/zsky" >> /etc/rc.local
+echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs

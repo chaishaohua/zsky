@@ -71,6 +71,7 @@ DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
 
+sitename="磁力管家"
 
 class LoginForm(FlaskForm):
     name=StringField('用户名',validators=[DataRequired(),Length(1,32)])
@@ -164,18 +165,10 @@ def load_user(id):
 @app.route('/',methods=['GET','POST'])
 #@cache.cached(60*60*24)
 def index():
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    totalsql='select count(*) from film'
-    curr.execute(totalsql)
-    totalcounts=curr.fetchall()
-    total=int(totalcounts[0]['count(*)'])
-    curr.close()
-    conn.close()
-    keywords=Search_Keywords.query.order_by(Search_Keywords.order).all()
+    keywords=Search_Keywords.query.order_by(Search_Keywords.order).limit(10)
     form=SearchForm()
-    return render_template('index.html',form=form,keywords=keywords,total=total)
-
+    return render_template('index.html',form=form,keywords=keywords)
+  
 def make_cache_key(*args, **kwargs):
     path = request.path
     args = str(hash(frozenset(request.args.items())))
@@ -197,139 +190,55 @@ def tothunder_filter(magnet):
     return base64.b64encode('AA'+magnet+'ZZ')
 app.add_template_filter(tothunder_filter,'tothunder')
 
-@app.route('/search',methods=['GET','POST'])
+
+today=int(time.mktime(datetime.datetime.now().timetuple()))
+thisweek=today-86400*7
+categoryquery={0:"",1:"and category='影视'",2:"and category='音乐'",3:"and category='图像'",4:"and category='文档书籍'",5:"and category='压缩文件'",6:"and category='安装包'",7:"and category='其他'"}
+sorts={0:"",1:"ORDER BY length DESC",2:"ORDER BY create_time DESC",3:"ORDER BY requests DESC",4:"ORDER BY last_seen DESC"}
+
+@app.route('/btsoso-<query>-<int:category>-<int:order>-<int:page>.html',methods=['GET','POST'])
+#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+def search_results(query,category,order,page=1):
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    currzsky.execute(taginsertsql,query)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
+    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    curr = conn.cursor()
+    sqlpre=' SELECT * FROM film WHERE match(%s) '
+    sqlend=' limit %s,20 OPTION max_matches=500000 '
+    querysql=sqlpre + categoryquery[category] + sorts[order] +sqlend
+    curr.execute(querysql,(query,(page-1)*20))
+    queryresult=curr.fetchall()
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
+    curr.close()
+    conn.close()
+    pages=(counts+19)/20
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(500)
+    form=SearchForm()
+    form.search.data=query
+    return render_template('list.html',form=form,query=query,pages=pages,page=page,category=category,order=order,hashs=queryresult,counts=counts,taketime=taketime,tags=tags,sitename=sitename)
+
+
+
+@app.route('/btsoso',methods=['GET','POST'])
 def search():
     form=SearchForm()
     query=re.sub(r"(['`=\(\)|\-!@~\"&/\\\^\$])", r"\\\1", form.search.data)
     if not form.search.data:
         return redirect(url_for('index'))
-    return redirect(url_for('search_results',query=query,page=1))
+    return redirect(url_for('search_results',query=query,category=0,order=0,page=1))
 
-
-@app.route('/main-search-kw-<query>-<int:page>.html',methods=['GET','POST'])
-#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results(query,page=1):
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    currzsky.execute(taginsertsql,query)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
-    #page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) limit %s,20 OPTION max_matches=5000'
-    curr.execute(querysql,[query,(page-1)*20])
-    result=curr.fetchall()
-    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
-    countsql='SHOW META'
-    curr.execute(countsql)
-    resultcounts=curr.fetchall()
-    counts=int(resultcounts[0]['Value'])
-    taketime=float(resultcounts[2]['Value'])
-    curr.close()
-    conn.close()
-    pages=(counts+19)/20
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-    form=SearchForm()
-    form.search.data=query
-    return render_template('list.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
-
-
-@app.route('/main-search-kw-<query>-length-<int:page>.html',methods=['GET','POST'])
-#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_bylength(query,page=1):
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    currzsky.execute(taginsertsql,query)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
-    #page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY length DESC limit %s,20 OPTION max_matches=1000'
-    curr.execute(querysql,[query,(page-1)*20])
-    result=curr.fetchall()
-    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
-    countsql='SHOW META'
-    curr.execute(countsql)
-    resultcounts=curr.fetchall()
-    counts=int(resultcounts[0]['Value'])
-    taketime=float(resultcounts[2]['Value'])
-    curr.close()
-    conn.close()
-    pages=(counts+19)/20
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-    form=SearchForm()
-    form.search.data=query
-    return render_template('list_bylength.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
-
-
-@app.route('/main-search-kw-<query>-time-<int:page>.html',methods=['GET','POST'])
-#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_bycreate_time(query,page=1):
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    currzsky.execute(taginsertsql,query)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
-    #page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY create_time DESC limit %s,20 OPTION max_matches=1000'
-    curr.execute(querysql,[query,(page-1)*20])
-    result=curr.fetchall()
-    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
-    countsql='SHOW META'
-    curr.execute(countsql)
-    resultcounts=curr.fetchall()
-    counts=int(resultcounts[0]['Value'])
-    taketime=float(resultcounts[2]['Value'])
-    curr.close()
-    conn.close()
-    pages=(counts+19)/20
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-    form=SearchForm()
-    form.search.data=query
-    return render_template('list_bycreate_time.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
-
-@app.route('/main-search-kw-<query>-requests-<int:page>.html',methods=['GET','POST'])
-#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
-def search_results_byrequests(query,page=1):
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    currzsky.execute(taginsertsql,query)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
-    #page=request.args.get('page',1,type=int)
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    querysql='SELECT * FROM film WHERE MATCH(%s) ORDER BY requests DESC limit %s,20 OPTION max_matches=1000'
-    curr.execute(querysql,[query,(page-1)*20])
-    result=curr.fetchall()
-    #countsql='SELECT COUNT(*)  FROM film WHERE MATCH(%s)'
-    countsql='SHOW META'
-    curr.execute(countsql)
-    resultcounts=curr.fetchall()
-    counts=int(resultcounts[0]['Value'])
-    taketime=float(resultcounts[2]['Value'])
-    curr.close()
-    conn.close()
-    pages=(counts+19)/20
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(50)
-    form=SearchForm()
-    form.search.data=query
-    return render_template('list_byrequests.html',form=form,query=query,pages=pages,page=page,hashs=result,counts=counts,taketime=taketime,tags=tags)
 
 @app.route('/hash/<info_hash>.html',methods=['GET','POST'])
-#@cache.cached(timeout=60*60,key_prefix=make_cache_key)
+@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(info_hash):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
@@ -341,11 +250,21 @@ def detail(info_hash):
     #hash=Search_Hash.query.filter_by(id=id).first()
     if not result:
         return redirect(url_for('index'))        
-    fenci_list=jieba.analyse.extract_tags(result['name'], 8)
-    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(20)
+    fenci_list=jieba.analyse.extract_tags(result['name'], 16)
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    keywordinsertsql = 'REPLACE INTO search_keywords(keyword) VALUES(%s)'
+    for x in fenci_list:
+        currzsky.execute(keywordinsertsql,x)
+    connzsky.commit()
+    keywordsgetsql= 'SELECT * FROM search_keywords WHERE id >= ((SELECT MAX(id) FROM search_keywords)-(SELECT MIN(id) FROM search_keywords)) * RAND() + (SELECT MIN(id) FROM search_keywords)  LIMIT 200'      #内容页面随机调用关键词
+    currzsky.execute(keywordsgetsql)
+    randkeywords=currzsky.fetchall()
+    currzsky.close()
+    connzsky.close()
     form=SearchForm()
-    return render_template('detail.html',form=form,tags=tags,hash=result,fenci_list=fenci_list)
-
+    tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(200)
+    return render_template('detail.html',form=form,tags=tags,hash=result,randkeywords=randkeywords,fenci_list=fenci_list)
 
 @app.route('/sitemap.xml')
 def sitemap():    
@@ -433,7 +352,7 @@ class HashView(ModelView):
     create_modal = True
     edit_modal = True
     can_export = True
-    column_searchable_list = ['info_hash']
+    column_searchable_list = ['name']
     def get_list(self, *args, **kwargs):
         count, data = super(HashView, self).get_list(*args, **kwargs)
         count=10000
@@ -491,7 +410,7 @@ class FileManager(FileAdmin):
         return redirect(url_for('admin.login_view'))
 
 
-admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/haoyue91529'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='首页推荐'))
 admin.add_view(TagsView(Search_Tags, db.session,name='搜索记录'))
