@@ -59,10 +59,10 @@ yum -y install python-pip
 yum -y install redis
 pip install -r requirements.txt
 #如果提示没有pip命令,或者你使用linode的主机,请取消下面4行的注释
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-yum clean metadata
-yum makecache
+#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+#wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+#yum clean metadata
+#yum makecache
 cd /root/zsky
 mkdir /root/zsky/uploads
 \cp -rpf systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
