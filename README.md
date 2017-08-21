@@ -4,7 +4,7 @@
 ```Bash
 yum -y install git 
 
-git  clone https://github.com/chaishaohua/bt.git
+git  clone https://github.com/chaishaohua/zsky.git
 
 cd zsky&&sh zsky.sh
 ```
