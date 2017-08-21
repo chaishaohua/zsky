@@ -13,7 +13,7 @@ cd zsky&&sh zsky.sh
 ```Bash
 apt-get -y install git 
 
-git  clone https://github.com/chaishaohua/bt.git
+git  clone https://github.com/chaishaohua/zsky.git
 
 cd zsky&&sh zsky_debian.sh
 ```
