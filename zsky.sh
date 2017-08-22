@@ -15,7 +15,7 @@ grep SwapTotal /proc/meminfo
 if [ $? -ne 0 ]
 then
 	echo "主机没有swap, 将自动创建swap"
-	fallocate -l 1G /swapfile
+	fallocate -l 2G /swapfile
 	chmod 600 /swapfile
 	mkswap /swapfile
 	swapon /swapfile
