@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-transform " />
+  <title>最近搜索 - 男人都爱上的磁力连接搜索引擎</title>
+  <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+  <meta name="keywords" content="{{sitename}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎">
+  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
+  <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+  {{ moment.include_moment() }}
+  {{ moment.lang("zh-cn") }}
+</head>
+<body>
+{%include'head.html'%}
+    <div class="mainbox">
+  <div class="conbox pdlr20">
+    <div class="shead cl">
+<form name="search" class="main-search form-search text-center" method="POST" action="{{url_for('search')}}">
+ <div class="q-input">
+        {{form.hidden_tag()}}
+   {{form.search(id="kw",class="search-query",placeholder="电影，音乐，小说，文件，图片",required="required",autocomplete = "off" ,autofocus="autofocus")}}
+       <input type="submit" id="btnSearch" value="搜索" class="btn">
+        </div>
+  </form>
+              <p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
+		 <p class="grey" style="margin-top:10px;">
+		 站长推荐工具：&nbsp;&nbsp;&nbsp; 
+		 </p>
+<div class="dleft">
+<div class="cl">
+<!-- 内容广告 -->
+</div> 
+  <div class="filelist">
+      <div class="tit cl">热门搜索</div>
+	  <ul>
+	  {% for tag in tags%}
+  <a title="{{tag.tag}}" href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}">{{tag.tag}}</a>&nbsp;&nbsp;&nbsp;{% endfor%}
+	   </ul>
+	</div>
+ <p class="cl">
+     <div class="pagination">
+	       <ul>
+          <span>共{{pages}}页</span> 
+{% set prev_pages = page-4 if page>5 else 1 %}
+{% set next_pages = page+5 if page+5<=pages else pages%}
+    {%if pages<10%}
+{%if page==1%}
+<li><a href="#">上一页</a></li></li>
+{%else%}
+<li><a href="{{ url_for('tag', page=page-1 )}}">上一页</a></li>
+{%endif%}
+{%for i in range(1,pages+1)%}
+    <li><a href="{{ url_for('tag', page=i )}}">{{i}}</a></li>
+{%endfor%}
+{%if page<pages%}
+<li><a href="{{ url_for('tag', page=page+1) }}">下一页</a></li>
+{%else%}
+<li><a href="#">下一页</a></li>
+{%endif%}    
+    {%else%}
+{%if page==1%}
+<li><a href="#">上一页</a></li>
+{%else%}
+<li><a href="{{ url_for('tag', page=page-1 )}}">上一页</a></li>
+{%endif%}
+{%for i in range(prev_pages,page)%}
+    <li><a href="{{ url_for('tag', page=i )}}">{{i}}</a></li>
+{%endfor%}
+<span>{{page}}</span>
+{%for i in range(page+1,next_pages+1)%}
+    <li><a href="{{ url_for('tag', page=i )}}">{{i}}</a></li>
+{%endfor%}
+{%if page<pages%}
+<li><a href="{{ url_for('tag', page=page+1) }}">下一页</a></li>
+{%else%}
+<li><a href="#">下一页</a></li>
+{%endif%}
+    {%endif%}
+                </ul>
+</div>
+</p>
+</div>
+	  
+<div class="dright">
+     <div class="filelist">
+      <div class="tit cl">人气女优</div>
+   <p> <ul class="s-news-rank-content">
+{% for actor in actors[-9:] %}
+<li class="news-meta-item news-artist">
+<a title="{{actor.actorname}}" href="{{url_for('search_results',query=actor.actorname,category=0,order=0,page=1)}}">{{actor.actorname}}</a></li>{% endfor%}
+</ul>
+</p>
+      </div>
+  </div>
+</div></div></div>
+
+	<p>
+	<br />
+</p>
+{%include'footer.html'%}
+</body>
+</html>

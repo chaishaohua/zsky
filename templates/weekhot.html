@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本周最热门的200个BT种子 -{{sitename}}- 男人都爱上的磁力连接搜索引擎</title>
+  <meta name="keywords" content="{{sitename}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎">
+  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="{{sitename}}-男人都爱上的磁力连接搜索引擎"/>
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="//dg12.qiniudn.com/amazeui.custom.min.css">
+  <link rel="stylesheet" href="//dg12.qiniudn.com/app.css">
+</head>
+{%include'head.html'%}
+    
+    <div class="am-margin-top am-margin-bottom">
+      <form name="search" class="am-form" method="post" action="{{url_for('search')}}"  >
+        <div class="am-input-group am-input-group-secondary">
+        {{form.hidden_tag()}}
+        {{form.search(id="kw",class="am-form-field am-input-lg",placeholder="输入电影、电视、女演员、番号等磁力链接资源名称...",required="required",autocomplete = "on" ,autofocus="autofocus")}}
+          <span class="am-input-group-btn am-btn-xl "><button class="am-btn am-btn-xl am-btn-secondary" type="submit">搜索磁力</button></span>
+        </div>
+      </form>
+    </div>
+    
+  </div>
+</div>
+<div class ="wrap">
+
+<div class="am-container ">
+      <div class="hot-search am-panel am-panel-default am-margin-bottom-0">
+        <div data-am-widget="titlebar" class="am-titlebar am-titlebar-default" >
+          <h2 class="am-titlebar-title ">热门搜索</h2>
+          <nav class="am-titlebar-nav"><a href="{{url_for('tag',page=1)}}" class="" target="_blank">更多 &raquo;</a></nav>
+        </div>
+        <div class="am-panel-bd">
+        {%for tag in tags[:30]%}
+    <a href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}" target="_blank">{{tag.tag}}</a>     
+    {%endfor%}
+        </div>
+      </div>
+    </div>
+
+
+<div class="am-container ">
+<div class="notice am-margin-top-sm">
+    <div class="am-panel am-panel-default">
+      <div class="am-panel-bd">
+        <h2><img src="//dg12.qiniudn.com/hot.png" alt="day_popular">本周最热门的200个BT种子磁力链接</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="am-container">
+      <div class="am-panel am-panel-default am-margin-top-sm am-margin-bottom-sm">
+        <div data-am-widget="titlebar" class="am-titlebar am-titlebar-default" >
+            <h2 class="am-titlebar-title ">把<i>{{sitename}}</i>分享给好友</h2>
+        </div>
+        <div class="am-panel-bd am-text-warning sidebar">
+            
+        <!-- JiaThis Button BEGIN -->
+        <div class="jiathis_style_32x32">
+            <a class="jiathis_button_cqq"></a>
+            <a class="jiathis_button_qzone"></a>
+            <a class="jiathis_button_tsina"></a>
+            <a class="jiathis_button_tqq"></a>
+            <a class="jiathis_button_weixin"></a>
+            <a class="jiathis_button_renren"></a>
+            <a class="jiathis_button_tieba"></a>
+            <a class="jiathis_button_baidu"></a>
+            <a class="jiathis_button_douban"></a>
+            <a class="jiathis_button_hi"></a>
+            <a class="jiathis_button_yixin"></a>
+            <a class="jiathis_button_xiaoyou"></a>
+            <a class="jiathis_button_qq"></a>
+            <a class="jiathis_button_twitter"></a>
+            <a class="jiathis_button_fb"></a>
+            <a class="jiathis_button_delicious"></a>
+            <a class="jiathis_button_reddit"></a>
+            <a class="jiathis_button_yijee"></a>
+            <a href="http://www.jiathis.com/share?uid=2141073" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+            <a class="jiathis_counter_style"></a>
+        </div>
+        <!-- JiaThis Button END -->
+        <div class="am-cf"></div>
+        <span class="red f14">亲，你知道吗？下载的人越多速度越快，赶快把本页面分享给好友一起下载吧^_^</span>
+    
+        </div>
+      </div>
+    </div>
+
+
+<div class="am-container">
+    <div class="search_list">
+    {% for hash in weekhot %}
+            <dl class="detail">
+            <dt><span class="red fb"><img src="//dg12.qiniudn.com/weekhot.png" alt="new">【{{ hash['category'] }}】</span>
+<a href="{{url_for('detail',info_hash=hash.info_hash)}}" target="_blank"><span> {{hash.name}}</span></a></dt>
+            <dd class="info">
+                <span>收录时间:<b>{{ hash['create_time']|todate }}</b></span>
+                <span>文档大小:{% if hash['length']>1073741824 %}
+<b>{{(hash['length']/1073741824)|round(2)}}G</b>
+{% else %}<b>{{(hash['length']/1048576)|round(2)}}M</b>
+{%endif%}</span>
+                <span>最近下载:<b>{{ hash['last_seen']|todate }}</b></span>
+                <span>人气:<b>{{hash['requests']}}</b></span>
+                <span><a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}&dn={{ hash.name }}" target="_blank">磁力链接</a></span>
+            </dd>
+            <ul class="filelist">
+
+{%for f in (hash.info_hash|filelist)[:20]%}
+<li>{{f['path']}}&nbsp;<span class="gray_color">
+{%if f['length']>1073741824%}
+{{(f['length']/1073741824)|round(2)}}G
+{%elif f['length']>1048576%}
+{{(f['length']/1048576)|round(2)}}M
+{%elif f['length']>1024%}
+{{(f['length']/1024)|round(2)}}K
+{%else%}
+{{f['length']}}字节
+{%endif%}
+</span></li>
+{% endfor %}
+
+            </ul>
+<dd class="like"><img src="//dg12.qiniudn.com/heart.png" alt="heart"><span>猜你喜欢：
+{% for x in hash.name|fenci(10) %}
+<a href="{{url_for('search_results',query=x,category=0,order=0,page=1)}}" target="_blank">{{x}}</a>
+{% endfor %}
+</span></dd>
+        </dl>
+{%endfor%}
+    </div>
+  </div>
+
+</div>    
+</div>
+</div><!--end warp-->
+
+{%include'footer.html'%}

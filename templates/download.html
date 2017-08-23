@@ -1,0 +1,55 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>下载BT种子文件 - {{hash['name'] }} - {{sitename}}</title>
+<STYLE type=text/css>
+* { margin:0;  }
+#down_btn{width:200px; height:30px; line-height:30px;border:1px solid
+#C1DBE9; background:
+#F5F8FD; color:
+#94D60E; font-weight:bold; font-size:16px; cursor:pointer; margin:20px auto;}
+</STYLE>
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="//dg12.qiniudn.com/amazeui.custom.min.css">
+  <link rel="stylesheet" href="//dg12.qiniudn.com/app.css">
+</head>
+<body bgcolor="#F9F9F9" >
+<br><br><br>
+<div align="center">
+<table width="766" border="2" cellspacing="0" cellpadding="0" bgcolor="#EDF6FD" >
+
+<tr><td align="center">
+
+
+
+</td></tr>
+
+<tr><td align="center"><br><br>
+<p>
+<font color="red" >{{hash['name'] }}</font><br>
+
+  <form action="http://itorrents.org/torrent/{{hash['info_hash'] | upper}}.torrent" method="post">
+  <input type="hidden" value="torrent" id="type" name="type" />
+  <input type="hidden" value="{{hash['name'] }}" id="id" name="id" />
+  <input type="hidden" value="{{hash['info_hash'] | upper}}" id="name" name="name" />
+  <input type="submit" value="  下 載 /  down  "  onclick="setpos();" class="round_box" id="down_btn" />  
+  </form>
+  
+  </p><br><br>
+</td></tr>
+<tr><td align="center">
+
+  
+</td></tr></table>
+
+<font size="1">Copyright © <SPAN ><SCRIPT>   var d = new Date();  document.write(d.getFullYear() + "-" +(d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() ); </SCRIPT></SPAN> & All Rights Reserved </font>
+</div>
+
+</body>
+
+<STYLE type=text/css>A:hover {LEFT: 3pt; POSITION: relative; TOP: 3pt; VISIBILITY: visible}</STYLE>
+
+</html>

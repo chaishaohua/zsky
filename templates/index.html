@@ -1,47 +1,65 @@
+
 <!DOCTYPE html>
 <html>
- <head> 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="Cache-Control" content="no-transform " />
-  <meta http-equiv="Cache-Control" content="no-siteapp" />
-  <meta name="applicable-device" content="pc,mobile">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
-    <title>Btbook - DHT Magnet Search</title>
-    <meta name="keywords" content="Magnetic search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search, search Search engine, seed search, BT search search, BT search, magnetic search, magnetic chain, magnetic link search, magnetic link search engine, Thunder download">
-    <meta name="description" content="a simple DHT research website." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> 
-  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico"/>
-  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico"/>
-  <!--<link type="text/css" rel="stylesheet" href="//dg12.qiniudn.com/bt.css" />-->
-  <link type="text/css" rel="stylesheet" href="//css.315g.cn/bt.css" />
- </head> 
+  <title>{{sitename}}-男人都爱上的磁力连接搜索引擎</title>
+  <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+  <meta name="keywords" content="{{sitename}}宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索
+神器,磁力链接搜索,磁力链接搜索引擎">
+  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
+  <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+</head>
+<body>
 {%include'head.html'%}
-    <div class="searchbox">
-      <form action="{{url_for('search',category=0,page=1)}}" name="search" id="searchFrom" method="POST"  >
-  <div class="search">
-{{form.hidden_tag()}}
-          <div class="sbtn"><button value="磁力搜索" type="submit" >磁力搜索</button></div>
-<div class="wd" >
-{{form.search(id="search",placeholder="输入关键词搜索BT种子...",autocomplete = "on" ,autofocus="autofocus")}}
-</div>
-        </div>
-      </form>
+    <div class="mainbox">
+  <div class="conbox">
+    <div class="logo">
+       <img src="//dg12.qiniudn.com/nanrencililogo3.png" alt="蜘蛛磁力搜索" class="logo" />
+       </div>
+     <div class="schcon q-input">	
+<form name="search" class="main-search form-search text-center" method="POST" action="{{url_for('search')}}"    style="margin: 0 auto;">
+     {{form.hidden_tag()}}
+{{form.search(id="kw",class="search-query",placeholder="输入电影、电视、女演员、番号等磁力链接资源名称...",required="required",autocomplete = "on" ,autofocus="autofocus")}}
+	<input type="submit" id="btnSearch" value="搜索" class="btn">
+	</form>
+      <p class="grey" style="margin-top:13px;"><span>资源总数<em>{{total}}</em>个</span>, <span> 今日收录<em>{{ today  if today else 0}}</em>个</span></p>
+          <div class="top cl">
+        <dl class="fl month">
+          <dt>今日更新</dt>
+		<dd>
+	{% for n in newest[-9:] %}
+      <p><span class="idx3">新</span><a href="{{url_for('detail',info_hash=n.info_hash)}}">{{n.name|truncate(30)}}<i class="fr"></i></a></p>
+	{% endfor%}
+      </dd>
+        </dl>
+        <dl class="fl week">
+          <dt>人气女优</dt>
+		<dd>
+	{% for actor in actors[-9:] %}
+      <p><span class="idx3">赞</span>
+	  <a href="{{url_for('search_results',query=actor.actorname,category=0,order=0,page=1)}}">{{actor.actorname}}<i class="fr"></i></a></p>
+	{% endfor%}
+      </dd>
+        </dl>
+        <dl class="fl today">
+          <dt>热门搜索  &raquo; &raquo;<a href="{{url_for('tag',page=1)}}" class="" target="_blank">更多</a></dt>
+	<dd>
+ 	  {% for tag in tags[-9:] %}
+      <p><span class="idx3">搜</span>
+	  <a href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}">{{tag.tag}}<i class="fr"></i></a></p>
+	{% endfor%}
+	</dd>
+        </dl>
+      </div>
+	   </div>
     </div>
-<div class="f16 mt15 mb15">When boring, come<b>Btbook - DHT Magnet Search</b>Looking for the latest film, TV, music, game solution bored! :-)</div>
-    <div class="addthis_inline_share_toolbox_fkn6"></div>
-      <span class="red f14">btbook Due to the huge amount of visits, the relevant departments of harmony, the technical department of the emergency purchase of a number of anti-jump domain name, please click to view <a href="http://www.026001.cn/" target="_blank"><b>btbooK List of anti - jumps</b></a>^_^</span>
-    <div class="tbox"> 
-          <div class="ssbox"> 
-            <div class="title"> <h3><span class="f14">Btbook - DHT Magnet Search popular searches</span></h3> </div> 
-            <div class="rms">
-            {%for k in keywords%}
-            <span><a href="{{url_for('search_results',query=k.keyword,category=0,order=0,page=1)}}"><b>{{k.keyword}}</b></a></span>
-            {%endfor%}
-            </div> 
-          </div> 
-        </div>
-<span class="f14" ><strong><span style="color: #ff0000;">Tips: press at the same time<span style="background-color: #ff6600; color: #ffffff;">Ctrl+D</span>Can quickly add this site to the Favorites!</span></strong></span></div>
-  </div>
+</div>	
+
 {%include'footer.html'%}
 </body>
 </html>

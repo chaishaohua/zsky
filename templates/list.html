@@ -1,140 +1,117 @@
 
 <!DOCTYPE html>
 <html>
- <head> 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="Cache-Control" content="no-transform " />
-  <meta http-equiv="Cache-Control" content="no-siteapp" />
-  <meta name="applicable-device" content="pc,mobile">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
-  <meta name="description" content="Global senior friends online search list：{%for tag in tags%}{{tag.tag}}，{%endfor%}" />
-  <meta name="keywords" content="{{query}} free download,{{query}} search, {{query}} seed, 1BT seed, magnetic link, seed search, BT seed, seed search artifact, magnetic search, BT search, magnetic search, magnetic chain, magnetic link search, BT seed search" /> 
-  <title>For you to find on the 【{{query}}】 BT, Thunder download link a total of {{counts}} , search the latest magnetic resources - search the latest Torrent resources up to the best use of the most powerful magnetic search engine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> 
-  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico"/>
-  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico"/>
-  <!--<link type="text/css" rel="stylesheet" href="//dg12.qiniudn.com/bt.css" />-->
-  <link type="text/css" rel="stylesheet" href="//css.315g.cn/bt.css" />
- </head> 
- {%include'head.html'%}
-    <div class="searchbox">
-      <form action="{{url_for('search',category=0,query=query,page=1)}}" name="search" id="searchFrom" method="post" onsubmit="return submitForm(this);" >
-        <div class="search">
-    {{form.hidden_tag()}}
-          <div class="sbtn"><button value="Magnetic search" type="submit" >search</button></div>
-<div class="wd" >
-{{form.search(id="search",placeholder="Enter keyword search for BT seed ...",autocomplete = "on" ,autofocus="autofocus")}}   
-    </div>
-      </form>
-    </div>
-
-
-    <div class="tbox">
-      <div class="msg">
-        <span>For you to find about <span class="orange"> {{counts}} </span> magnetic links / BT seeds, takes {{(taketime*1000)|int}} milliseconds.</span><span>
-        </span>
-      </div>
-    </div>
-    <div class="tbox sort-box">
-      <div class="sortbar">
-        <span class="l-title">classification：</span>
- {% if category==0 %}  <a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}">{%endif%} All</a>
- {% if category==1 %}  <a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}">{%endif%} the film</a>
- {% if category==2 %}  <a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}">{%endif%} music</a>
- {% if category==3 %}  <a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}">{%endif%} image</a>
- {% if category==4 %}  <a href="{{url_for('search_results',query=query,category=4,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=4,order=order,page=1)}}">{%endif%} book</a>
- {% if category==5 %}  <a href="{{url_for('search_results',query=query,category=5,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=5,order=order,page=1)}}">{%endif%} zip/rar</a>
- {% if category==6 %}  <a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}">{%endif%} apk/ipa</a>
- {% if category==7 %}  <a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}">{%endif%} other</a>
-      </div>
-      <div class="sortbar">
-        <span class="l-title">Sort by：</span>
- {% if order==0 %} <a href="{{url_for('search_results',query=query,category=category,order=0,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=category,order=0,page=1)}}">{%endif%} Relevance</a>
- {% if order==3 %} <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}">{%endif%} Hot</a>
-{% if order==1 %} <a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}">{%endif%} File size</a>
-{% if order==2 %} <a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}">{%endif%} Add Time</a>
-{% if order==4 %} <a href="{{url_for('search_results',query=query,category=category,order=4,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=category,order=4,page=1)}}">{%endif%} Recent visit</a>
-      </div>
-    </div>
-    <div class="tbox">
-    {% for hash in hashs %}  
-            <div class="ssbox">
-            <div class="title">
-                <h3><span>[{{hash['category']}}]</span><a href="{{url_for('detail',info_hash=hash.info_hash)}}" target="_blank"> {{ hash.name }} </a></h3>
-            </div>
-            <div class="slist">
-                <ul>
-<li>{{hash.name}}&nbsp;<span class="lightColor">{% if hash['length']>1073741824 %}
-{{(hash['length']/1073741824)|round(2)}}G
-{% else %}{{(hash['length']/1048576)|round(2)}}M
-{%endif%}</span></li>
-                </ul>
-            </div>
-            <div class="sbar">
-                <span><a href="magnet:?xt=urn:btih:{{hash['info_hash'] | upper}}&dn={{ hash.name }}" target="_blank">[Magnetic link]</a></span>
-                <span>Add Time:<b>{{ hash['create_time']|todate }}</b></span>
-                <span>File size:{% if hash['length']>1073741824 %}
-<b class="cpill yellow-pill">{{(hash['length']/1073741824)|round(2)}}G</b>
-{% else %}<b class="cpill blue-pill">{{(hash['length']/1048576)|round(2)}}M</b>
-{%endif%}</span>
-                <span>Recent visit:<b>{{ hash['last_seen']|todate }}</b></span>
-                <span>Hot:<b>{{hash['requests']}}</b></span>
-            </div>
+  <title>{{query}} - {{sitename}} - 男人都爱上的磁力连接搜索引擎</title>
+  <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+  <meta name="keywords" content="{{sitename}},{{query}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎">
+  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
+  <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+  {{ moment.include_moment() }}
+  {{ moment.lang("zh-cn") }}
+</head>
+<body>
+{%include'head.html'%}
+    <div class="mainbox">
+  <div class="conbox pdlr20">
+    <div class="shead cl">
+<form name="search" class="main-search form-search text-center" method="POST" action="{{url_for('search')}}">
+ <div class="q-input">
+        {{form.hidden_tag()}}
+   {{form.search(id="kw",class="search-query",placeholder="电影，音乐，小说，文件，图片",required="required",autocomplete = "on" ,autofocus="autofocus")}}
+       <input type="submit" id="btnSearch" value="搜索" class="btn">
         </div>
-    {% endfor %}
-    </div>
-    <br>
-	 <div class="ssbox"><div class="title">
-   <h3><span>The world's senior line friends popular search list</a></h3>
+  </form>
+    	<p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
+	<p class="grey" style="margin-top:10px;">
+为您索检到：&nbsp;&nbsp;&nbsp; <span class="red">{{counts}}</span>条磁力链接，耗时{{(taketime*1000)|int}}毫秒。  
+</p>
+<div class="list cl">
+	<dl class="cl">
+	<dt><b>资源名:</b></dt>
+	<dd class="dsize">
+{% if order==1 %} <a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}" class="desc">{%else%}
+<a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}">{%endif%}大小</a>
+  </dd>
+  
+  <dd class="dsize">
+{% if order==2 %} <a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}" class="asc active">{%else%}
+<a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}">{%endif%}时间</a>
+      </dd>
+ <dd class="dmagg">
+	 {% if order==3 %} <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}" class="desc">{%else%}
+ <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}">{%endif%}热度</a>
+  </dd>
+		
+    {% for hash in hashs %}
+        <dt ><img src="//www.zzcili.net/static/img/torrent.gif" class="ico">
+		<a title="{% for x in hash.name|fenci(10) %}{{x}},{% endfor %}" href="{{url_for('detail',info_hash=hash.info_hash)}}"><span> {{hash.name}}</span></a></dt>
+        <dd class="dsize">{% if hash['length']>1073741824 %}
+{{(hash['length']/1073741824)|round(2)}} GB
+{% else %}{{(hash['length']/1048576)|round(2)}} MB
+{%endif%}</dd>
+        <dd class="dsize">{{ moment(hash['last_seen']|todate).fromNow(refresh=True) }}</dd>
+        <dd class="dmagg">{{hash['requests']}}</dd>
+	{% endfor %}
+	
+          </dl>            
+     <dl>
+       </dl>
   </div>
-    <div class="sbar">
-{%for tag in tags%}
-<span><a href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}"><b>{{tag.tag}}</b></a></span>
-{%endfor%}
-    </div></div>
-    <div class="addthis_inline_share_toolbox_fkn6_hr58_6og9_8vf5"></div>
-    <span class="red f14">Pro, do you know The more people download the faster, as soon as possible to share this page with friends to download it ^ _ ^</span>
-    <br>
-    <div class="pager">
-    <span>altogether {{pages}} page</span> 
+ <p class="cl">
+     <div class="pagination">
+	       <ul>
+<span>共{{pages}}页</span>  
 {% set prev_pages = page-4 if page>5 else 1 %}
 {% set next_pages = page+5 if page+5<=pages else pages%}
     {%if pages<10%}
 {%if page==1%}
-<a href="#">prev</a>
+<a href="#">上一页</a>
 {%else%}
-<a href="{{ url_for('search_results', query=query,category=category,order=order,page=page-1 )}}">prev</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=page-1 )}}">上一页</a></li>
 {%endif%}
 {%for i in range(1,pages+1)%}
-    <a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a></li>
 {%endfor%}
 {%if page<pages%}
-<a href="{{ url_for('search_results', query=query,category=category,order=order,page=page+1) }}">next page</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=page+1) }}">下一页</a></li>
 {%else%}
-<a href="#">next page</a>
+<li><a href="#">下一页</a></li>
 {%endif%}    
     {%else%}
 {%if page==1%}
-<a href="#">prev</a>
+<li><a href="#">上一页</a></li>
 {%else%}
-<a href="{{ url_for('search_results', query=query,category=category,order=order,page=page-1 )}}">prev</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=page-1 )}}">上一页</a></li>
 {%endif%}
 {%for i in range(prev_pages,page)%}
-    <a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a></li>
 {%endfor%}
 <span>{{page}}</span>
 {%for i in range(page+1,next_pages+1)%}
-    <a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=i )}}">{{i}}</a></li>
 {%endfor%}
 {%if page<pages%}
-<a href="{{ url_for('search_results', query=query,category=category,order=order,page=page+1) }}">next page</a>
+<li><a href="{{ url_for('search_results', query=query,category=category,order=order,page=page+1) }}">下一页</a></li>
 {%else%}
-<a href="#">next page</a>
+<li><a href="#">下一页</a></li>
 {%endif%}
     {%endif%}
-    </div>
-    </div>
+                </ul>
 </div>
+</p>
+  </div>
+</div>
+</div>
+
+	<p>
+	<br />
+</p>
 {%include'footer.html'%}
 </body>
 </html>
