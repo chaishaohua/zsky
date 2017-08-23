@@ -28,7 +28,16 @@
         </div>
   </form>
     	<p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
-	<p class="grey" style="margin-top:10px;">
+		<p class="grey" style="margin-top:10px;">分类： {% if category==0 %}  <a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}">{%endif%} 全部</a>
+ {% if category==1 %}  <a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}">{%endif%} 影视</a>
+ {% if category==2 %}  <a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}">{%endif%} 音乐</a>
+ {% if category==3 %}  <a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}">{%endif%} 图像</a>
+ {% if category==4 %}  <a href="{{url_for('search_results',query=query,category=4,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=4,order=order,page=1)}}">{%endif%} 文档书籍</a>
+ {% if category==5 %}  <a href="{{url_for('search_results',query=query,category=5,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=5,order=order,page=1)}}">{%endif%} 压缩文件</a>
+ {% if category==6 %}  <a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}">{%endif%} 安装包</a>
+ {% if category==7 %}  <a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}">{%endif%} 其他</a>
+ </p>
+		<p class="grey" style="margin-top:10px;">
 为您索检到：&nbsp;&nbsp;&nbsp; <span class="red">{{counts}}</span>条磁力链接，耗时{{(taketime*1000)|int}}毫秒。  
 </p>
 <div class="list cl">
@@ -39,26 +48,25 @@
 <a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}">{%endif%}大小</a>
   </dd>
   
-  <dd class="dsize">
+  <dd class="dmagg">
 {% if order==2 %} <a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}" class="asc active">{%else%}
 <a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}">{%endif%}时间</a>
       </dd>
- <dd class="dmagg">
+ <dd class="dsize">
 	 {% if order==3 %} <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}" class="desc">{%else%}
  <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}">{%endif%}热度</a>
   </dd>
 		
     {% for hash in hashs %}
-        <dt ><img src="//www.zzcili.net/static/img/torrent.gif" class="ico">
+        <dt ><img src="//css97ss.qiniudn.com/torrent.gif" class="ico">
 		<a title="{% for x in hash.name|fenci(10) %}{{x}},{% endfor %}" href="{{url_for('detail',info_hash=hash.info_hash)}}"><span> {{hash.name}}</span></a></dt>
         <dd class="dsize">{% if hash['length']>1073741824 %}
 {{(hash['length']/1073741824)|round(2)}} GB
 {% else %}{{(hash['length']/1048576)|round(2)}} MB
 {%endif%}</dd>
-        <dd class="dsize">{{ moment(hash['last_seen']|todate).fromNow(refresh=True) }}</dd>
-        <dd class="dmagg">{{hash['requests']}}</dd>
+        <dd class="dmagg">{{ moment(hash['last_seen']|todate).fromNow(refresh=True) }}</dd>
+        <dd class="dsize">{{hash['requests']}}</dd>
 	{% endfor %}
-	
           </dl>            
      <dl>
        </dl>
