@@ -1,0 +1,12 @@
+nohup: ignoring input
+exceptions must be old-style classes or derived from BaseException, not NoneType
+exceptions must be old-style classes or derived from BaseException, not NoneType
+Thread-1 started
+Traceback (most recent call last):
+  File "simdht_worker.py", line 382, in <module>
+    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=100000)
+  File "simdht_worker.py", line 176, in __init__
+    self.ufd.bind((self.bind_ip, self.bind_port))
+  File "/usr/lib64/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+socket.error: [Errno 98] Address already in use

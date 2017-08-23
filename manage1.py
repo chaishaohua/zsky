@@ -12,7 +12,6 @@ import codecs
 import time
 import os
 import datetime
-from flask_moment import Moment
 from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
 from flask_login import LoginManager,UserMixin,current_user,login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
@@ -66,7 +65,7 @@ cache = Cache(app,config = {
     'CACHE_REDIS_PASSWORD': ''
 })
 cache.init_app(app)
-moment = Moment(app)
+
 
 DB_HOST='127.0.0.1'
 DB_NAME_MYSQL='zsky'
@@ -199,7 +198,7 @@ def make_cache_key(*args, **kwargs):
 
 
 def todate_filter(s):
-    return datetime.datetime.fromtimestamp(int(s))
+    return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
 app.add_template_filter(todate_filter,'todate')
 
 def fromjson_filter(s):
@@ -237,7 +236,7 @@ def fenci_filter(title,n):
     return jieba.analyse.extract_tags(title, n)
 app.add_template_filter(fenci_filter,'fenci')
 
-#@cache.cached(60*5,key_prefix=make_cache_key)
+#@cache.cached(60*10,key_prefix=make_cache_key)
 def filelist_filter(info_hash):
     try:
         return json.loads(Search_Filelist.query.filter_by(info_hash=info_hash).first().file_list)
@@ -247,18 +246,6 @@ def filelist_filter(info_hash):
        'length':Search_Hash.query.filter_by(info_hash=info_hash).first().length
        }]
 app.add_template_filter(filelist_filter,'filelist')
-
-def gethash_filter(id):
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    hashsql='SELECT * FROM film WHERE id=%s'
-    curr.execute(hashsql,id)
-    hash=curr.fetchone()
-    curr.close()
-    conn.close()
-    return hash
-app.add_template_filter(gethash_filter,'gethash')
-
 
 
 @cache.cached(60*10,key_prefix="total_cache")
@@ -306,6 +293,39 @@ def newestcache():
     conn.close()
     return newest
 
+#@cache.cached(60*60,key_prefix="keywords_cache")
+#def keywordscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    keywordsquerysql='SELECT * FROM keywords order by id desc  LIMIT 300'
+#    curr.execute(keywordsquerysql)
+#    keywords=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return keywords
+#
+#@cache.cached(60*60,key_prefix="actors_cache")
+#def actorscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    actorsquerysql='SELECT * FROM actors order by id desc  LIMIT 300'
+#    curr.execute(actorsquerysql)
+#    actors=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return actors
+#
+#def tagscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    tagssql=' SELECT * FROM tags order by id desc limit 300'
+#    curr.execute(tagssql)
+#    tags=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return tags
+
+
 
 
 @app.route('/',methods=['GET','POST'])
@@ -322,7 +342,6 @@ def index():
     randomRow = query.offset(int(rowCount*random.random())).limit(40)
     #todaysql='select sum(new_hashes) from search_statusreport where to_days(search_statusreport.date)= to_days(now())'
     today=db.session.query(func.sum(Search_Statusreport.new_hashes)).filter(cast(Search_Statusreport.date,Date) == datetime.date.today()).scalar()
-
     return render_template('index.html',form=form,today=today,total=total,tags=tags,keywords=keywords,actors=randomRow,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename)
 
 
@@ -447,25 +466,23 @@ def search_results(query,category,order,page=1):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     sqlpre=' SELECT * FROM film WHERE match(%s) '
-    sqlend=' limit %s,50 OPTION max_matches=50000 '
-    searchsql=sqlpre + categoryquery[category] + sorts[order] +sqlend
-    curr.execute(searchsql,(query,(page-1)*20))
-    searchresult=curr.fetchall()
-    countssql='SHOW META'
-    curr.execute(countssql)
-    countsresult=curr.fetchall()
-    counts=int(countsresult[0]['Value'])
-    taketime=float(countsresult[2]['Value'])
+    sqlend=' limit %s,20 OPTION max_matches=20000 '
+    querysql=sqlpre + categoryquery[category] + sorts[order] +sqlend
+    curr.execute(querysql,(query,(page-1)*20))
+    queryresult=curr.fetchall()
+    countsql='SHOW META'
+    curr.execute(countsql)
+    resultcounts=curr.fetchall()
+    counts=int(resultcounts[0]['Value'])
+    taketime=float(resultcounts[2]['Value'])
+    actors=Search_Actors.query.order_by(Search_Actors.id.desc()).limit(300)
     tags=Search_Tags.query.order_by(Search_Tags.id.desc()).limit(300)
-    categorycountssql='SELECT category,count(*) as count FROM film WHERE match(%s) group by category order by category desc'
-    curr.execute(categorycountssql,query)
-    categorycounts=curr.fetchall()
     curr.close()
     conn.close()
     pages=(counts+19)/20
     form=SearchForm()
     form.search.data=query
-    return render_template('list.html',form=form,query=query,pages=pages,page=page,category=category,order=order,hashs=searchresult,counts=counts,categorycounts=categorycounts,taketime=taketime,tags=tags,sitename=sitename)
+    return render_template('list.html',form=form,query=query,pages=pages,page=page,actors=actors,category=category,order=order,hashs=queryresult,counts=counts,taketime=taketime,tags=tags,sitename=sitename)
 
 
 @app.route('/search',methods=['GET','POST'])
@@ -498,18 +515,9 @@ def detail(info_hash):
         return redirect(url_for('index'))
     if Complaint.query.filter_by(info_hash=info_hash).first():
         return render_template('complaintdetail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename) 
-    fenci_list=jieba.analyse.extract_tags(hash['name'], 100)
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    for x in fenci_list:
-        currzsky.execute(taginsertsql,x)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
     return render_template('detail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename)
 
-@app.route('/download/<info_hash>.html',methods=['GET','POST'])
+@app.route('/download/<info_hash>',methods=['GET','POST'])
 def download(info_hash):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
