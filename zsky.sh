@@ -1,12 +1,5 @@
 #!/bin/sh
-#By 我本戏子 2017.8
-
-HOSTNAME="127.0.0.1"
-PORT="3306"
-USERNAME="root"
-PASSWORD=""
-DBNAME="zsky"  
-
+#By 我本戏子 2017.7
 if [ $(id -u) != "0" ]; then
     echo "当前非root用户登录系统， 请使用root用户运行此脚本!"
     exit 1
@@ -15,7 +8,7 @@ grep SwapTotal /proc/meminfo
 if [ $? -ne 0 ]
 then
 	echo "主机没有swap, 将自动创建swap"
-	fallocate -l 2G /swapfile
+	fallocate -l 1G /swapfile
 	chmod 600 /swapfile
 	mkswap /swapfile
 	swapon /swapfile
@@ -61,6 +54,7 @@ echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install psmisc net-tools lsof epel-release
+yum -y install git
 yum -y install python-pip
 yum -y install redis
 pip install -r requirements.txt
@@ -70,16 +64,16 @@ pip install -r requirements.txt
 #yum clean metadata
 #yum makecache
 cd /root/zsky
-mkdir -p /root/zsky/uploads  /root/zsky/uploads/nvyou  /root/zsky/uploads/nvyou
+mkdir /root/zsky/uploads
 \cp -rpf systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
 systemctl daemon-reload	
 \cp -rpf /root/zsky/my.cnf  /etc/my.cnf 
 systemctl start  mariadb.service 
 systemctl enable mariadb.service
-mysqladmin -uroot -p password ${PASSWORD}
 systemctl start redis.service
 systemctl enable redis.service
-mysql -h${HOSTNAME}  -P${PORT}  -u${USERNAME} -p${PASSWORD} -e "create database IF NOT EXISTS ${DBNAME} default character set utf8mb4;set global max_allowed_packet = 64*1024*1024;set global max_connections = 100000;" 
+mysql -uroot  -e"create database zsky default character set utf8mb4;"  
+mysql -uroot  -e"set global interactive_timeout=31536000;set global wait_timeout=31536000;set global max_allowed_packet = 64*1024*1024;set global max_connections = 10000;" 
 #建表
 python manage.py init_db
 #按照提示输入管理员用户名、密码、邮箱
@@ -92,11 +86,12 @@ systemctl start  nginx.service
 systemctl enable  nginx.service
 \cp -rpf /root/zsky/nginx.conf  /etc/nginx/nginx.conf 
 nginx -s reload
+cd /root/zsky
 #启动后端gunicorn+gevent,开启日志并在后台运行
 systemctl start gunicorn
 systemctl enable gunicorn
 #启动爬虫,开启日志并在后台运行
-nohup python /root/zsky/simdht_worker.py >/root/zsky/spider.log 2>&1& 
+nohup python simdht_worker.py >/root/zsky/spider.log 2>&1& 
 #编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
 git clone https://github.com/wenguonideshou/sphinx-jieba.git
@@ -125,18 +120,17 @@ echo "systemctl start  nginx.service" >> /etc/rc.local
 echo "systemctl start  gunicorn.service" >> /etc/rc.local
 echo "systemctl start  indexer.service" >> /etc/rc.local
 echo "systemctl start  searchd.service" >> /etc/rc.local
-echo "nohup python /root/zsky/simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
+echo "cd /root/zsky" >> /etc/rc.local
+echo "nohup python simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
 systemctl start crond.service
 systemctl enable crond.service
 crontab -l > /tmp/crontab.bak
-echo '*/1 * * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf keywords actors tags --rotate' >> /tmp/crontab.bak
 echo '0 5 * * * /usr/local/sphinx-jieba/bin/indexer -c /root/zsky/sphinx.conf film --rotate&&/usr/local/sphinx-jieba/bin/searchd --config ~/zsky/sphinx.conf' >> /tmp/crontab.bak
 crontab /tmp/crontab.bak
 echo '当前进程运行状态:'
 pgrep -l nginx
 pgrep -l searchd
 pgrep -l gunicorn
-echo 'ZSKY2.0安装完成, 请修改/etc/nginx/nginx.conf里面绑定的域名! 然后运行nginx -s reload即可!'
