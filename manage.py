@@ -717,7 +717,6 @@ def init_db():
     db.create_all()
     db.session.commit()
 
-
 @manager.option('-u', '--name', dest='name')
 @manager.option('-e', '--email', dest='email')
 @manager.option('-p', '--password', dest='password')
