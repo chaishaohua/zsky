@@ -28,7 +28,7 @@
         </div>
   </form>
     	<p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
-		<p class="grey" style="margin-top:10px;">分类： {% if category==0 %}  <a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}">{%endif%} 全部</a>
+		<p class="grey" style="margin-top:10px;">三观： {% if category==0 %}  <a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}">{%endif%} 全部</a>
  {% if category==1 %}  <a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}">{%endif%} 影视</a>
  {% if category==2 %}  <a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}">{%endif%} 音乐</a>
  {% if category==3 %}  <a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=3,order=order,page=1)}}">{%endif%} 图像</a>
@@ -37,6 +37,15 @@
  {% if category==6 %}  <a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}">{%endif%} 安装包</a>
  {% if category==7 %}  <a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}">{%endif%} 其他</a>
  </p>
+              <p class="grey" style="margin-top:10px;">姿势： 
+                {% set highdefinition=["4k","1080p","720p","BD","HD"] %}
+                {%for h in highdefinition%}
+     <a href="{{url_for('search_results',query=h,category=0,order=0,page=1)}}">{{h}}</a>{%endfor%}
+                {% set video=["mkv","avi","rmvb","wmv","3pg"] %}
+                {%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=0,page=1)}}">{{v}}</a>
+                {%endfor%}
+      </p>
 		<p class="grey" style="margin-top:10px;">
 为您索检到：&nbsp;&nbsp;&nbsp; <span class="red">{{counts}}</span>条磁力链接，耗时{{(taketime*1000)|int}}毫秒。  
 </p>
