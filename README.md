@@ -4,7 +4,7 @@
 ```Bash
 yum -y install git 
 
-git  clone https://github.com/chaishaohua/zsky.git
+git  clone https://github.com/12345bt/zsky.git
 
 cd zsky&&sh zsky.sh
 ```
@@ -13,7 +13,7 @@ cd zsky&&sh zsky.sh
 ```Bash
 apt-get -y install git 
 
-git  clone https://github.com/chaishaohua/zsky.git
+git  clone https://github.com/12345bt/zsky.git
 
 cd zsky&&sh zsky_debian.sh
 ```
@@ -84,10 +84,6 @@ A：修改manage.py里的max_matches=1000
 
 A：修改manage.py里的sql语句 'SELECT info_hash,create_time FROM film order by create_time desc limit 100' 里的数量
 
-
-**Q：网站经常收到版权投诉，有没有好的解决办法？**
-
-A：除了删除投诉的影片数据外，你可以使用前端Nginx、后端gunicorn+爬虫+数据库+索引在不同主机上的模式，甚至多前端模式，这样 即使前端被主机商强行封机，也能保证后端数据的安全。如果有需求，请联系作者QQ 153329152 付费为你提供服务
 
 **Q：我觉得这程序非常垃圾，怎么卸载？**
 
