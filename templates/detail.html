@@ -27,7 +27,17 @@
        <input type="submit" id="btnSearch" value="搜索" class="btn">
         </div>
   </form>
-              <p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
+    	<p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
+
+              <p class="grey" style="margin-top:10px;">姿势： 
+                {% set highdefinition=["4k","1080p","720p","BD","HD"] %}
+                {%for h in highdefinition%}
+     <a href="{{url_for('search_results',query=h,category=0,order=0,page=1)}}">{{h}}</a>{%endfor%}
+                {% set video=["mkv","avi","rmvb","wmv","3pg"] %}
+                {%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=0,page=1)}}">{{v}}</a>
+                {%endfor%}
+      </p>
 		 <p class="grey" style="margin-top:10px;">
 		 站长推荐工具：&nbsp;&nbsp;&nbsp; 
 
