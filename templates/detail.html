@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-transform " />
   <title>{{hash.name}}_磁力链接_BT种子_迅雷下载_蜘蛛磁力搜索</title>
   <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
-  <meta name="keywords" content="{{hash.name}}" />
-  <meta name="description" content="蜘蛛磁力搜索是先进的BT磁力链接搜索引擎。这里有{{hash.name}}的免费资源下载，同时还提供{{hash.name}}在线云播放和迅雷离线下载，可以将资源BT种子保存在本地，支持小米路由一键下载。" />
+   <meta name="keywords" content="{% for tag in tags[-50:] %}{{tag.tag}},{% endfor%},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜">
+  <meta name="description" content="蜘蛛磁力搜索是先进的BT磁力链接搜索引擎。{{sitename}}提供{% for tag in tags[-30:] %}{{tag.tag}},{% endfor%}的bt资源免费资源下载，同时还提供{{hash.name}}在线云播放和迅雷离线下载，可以将资源BT种子保存在本地，支持小米路由一键下载。" />
   <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
   <script type="text/javascript" src="//code.jquery.com/jquery-1.8.3.min.js"></script>
   <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
@@ -15,7 +15,6 @@
   {{ moment.include_moment() }}
   {{ moment.lang("zh-cn") }}
 </head>
-<body>
 {%include'head.html'%}
     <div class="mainbox">
   <div class="conbox pdlr20">

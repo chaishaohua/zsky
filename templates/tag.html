@@ -41,16 +41,17 @@
     </div>
   </div>
 </div>
-<div class="am-container">
-    <div class="search_list">
-       <dl class="detail">
-<dd class="like"><span>
-{% for tag in tags%}
-<a href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}">{{tag.tag}}</a>&nbsp;&nbsp;&nbsp;
-{% endfor %}
-</span></dd>
-        </dl>
-    </div>
+	<div class="am-container ">
+      <div class="hot-search am-panel am-panel-default am-margin-bottom-0">
+        <div data-am-widget="titlebar" class="am-titlebar am-titlebar-default" >
+          <h2 class="am-titlebar-title ">热门搜索</h2>
+          <nav class="am-titlebar-nav"><a href="{{url_for('tag',page=1)}}" class="">更多 &raquo;</a></nav>
+        </div>
+        <div class="am-panel-bd">
+        {%for tag in tags%}
+    <span><a class="fb12" href="{{url_for('search_results',query=tag.tag,category=0,order=0,page=1)}}">{{tag.tag}}</a></span>{%endfor%}
+        </div>
+      </div>
         <div class="am-panel-bd">
           <div class="pagediv">
           <span>共{{pages}}页</span> 
