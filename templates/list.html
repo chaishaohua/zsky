@@ -4,29 +4,31 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="Cache-Control" content="no-transform " />
-  <title>{{query}} - {{sitename}} - 男人都爱上的磁力连接搜索引擎</title>
+  <title>{{query}}的BT有{{counts}}个_{{sitename}}新网址,中文版{{sitename}},电影BT种子,快播种子,快播资源下载,BT种子下载网站,{{sitename}}BT下载</title>
   <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
-  <meta name="keywords" content="{{sitename}},{{query}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎">
-  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
-  <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
-  <script type="text/javascript" src="//code.jquery.com/jquery-1.8.3.min.js"></script>
-  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
-  {{ moment.include_moment() }}
-  {{ moment.lang("zh-cn") }}
+  <meta name="keywords" content="{{sitename}},日本,番号库,影片截图,电影,日本电影库,日本电影番号,日本电影导演,日本电影发行商"  />
+  <meta name="description" content="{{sitename}}实时搜索{% for hash in hashs %}{% for x in hash.name|fenci(10)%}{{x}},{% endfor %}{%endfor%}热门搜索">
+  <link type="text/css" rel="stylesheet" href="//url123456.oss-cn-shenzhen.aliyuncs.com/btzhizhu.css" />
+  <script type="text/javascript" src="//url123456.oss-cn-shenzhen.aliyuncs.com/jquery-1.8.3.min.js"></script>
+  <link rel="shortcut icon" href="//url123456.oss-cn-shenzhen.aliyuncs.com/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//url123456.oss-cn-shenzhen.aliyuncs.com/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="//url123456.oss-cn-shenzhen.aliyuncs.com/hwdico.jpg" />
 </head>
 {%include'head.html'%}
     <div class="mainbox">
   <div class="conbox pdlr20">
+        <div class="logo">
+      <img src="//url123456.oss-cn-shenzhen.aliyuncs.com/hdw.jpg"  alt="{{sitename}}" class="logo" />
+       </div>
     <div class="shead cl">
 <form name="search" class="main-search form-search text-center" method="POST" action="{{url_for('search')}}">
  <div class="q-input">
         {{form.hidden_tag()}}
-   {{form.search(id="kw",class="search-query",placeholder="电影，音乐，小说，文件，图片",required="required",autocomplete = "on" ,autofocus="autofocus")}}
+   {{form.search(id="kw",class="search-query",placeholder="金瓶梅,灯草和尚,玉蒲团,满清十大酷刑...",required="required")}}
        <input type="submit" id="btnSearch" value="搜索" class="btn">
         </div>
   </form>
-    	<p class="grey" style="margin-top:10px;">搜索建议：大多数资源均以影视的英文名作为资源名</p>
+    	<p class="grey" style="margin-top:10px;">海盗湾搜索到{{counts}}个关于{{query}}的BT链接</p>
 		<p class="grey" style="margin-top:10px;">三观： {% if category==0 %}  <a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=0,order=order,page=1)}}">{%endif%} 全部</a>
  {% if category==1 %}  <a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=1,order=order,page=1)}}">{%endif%} 影视</a>
  {% if category==2 %}  <a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=2,order=order,page=1)}}">{%endif%} 音乐</a>
@@ -36,18 +38,28 @@
  {% if category==6 %}  <a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=6,order=order,page=1)}}">{%endif%} 安装包</a>
  {% if category==7 %}  <a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}" class="active">{%else%}<a href="{{url_for('search_results',query=query,category=7,order=order,page=1)}}">{%endif%} 其他</a>
  </p>
-              <p class="grey" style="margin-top:10px;">姿势： 
-                {% set highdefinition=["4k","1080p","720p","BD","HD"] %}
-                {%for h in highdefinition%}
-     <a href="{{url_for('search_results',query=h,category=0,order=0,page=1)}}">{{h}}</a>{%endfor%}
-                {% set video=["mkv","avi","rmvb","wmv","3pg"] %}
-                {%for v in video%}
-                <a href="{{url_for('search_results',query=v,category=0,order=0,page=1)}}">{{v}}</a>
-                {%endfor%}
-      </p>
-		<p class="grey" style="margin-top:10px;">
-为您索检到：&nbsp;&nbsp;&nbsp; <span class="red">{{counts}}</span>条磁力链接，耗时{{(taketime*1000)|int}}毫秒。  
-</p>
+              <p class="grey" style="margin-top:10px;">主题： 
+                {% set video=["乱伦","偷窥","萝莉","性感","SEX8","制服","少妇","教师","医生","秘书"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+              <p class="grey" style="margin-top:10px;">角色： 
+                {% set video=["姐姐","妹妹","小姨子","护士","主播","人妻","熟女","学生","荡妇","模特"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+              <p class="grey" style="margin-top:10px;">动作： 
+                {% set video=["3P","爆乳","肛交","内射","足交","颜射","4P","教师","空姐","女友"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+              <p class="grey" style="margin-top:10px;">品牌：  
+                {% set video=["sex8","第一會所","Thz","性吧","色中色","草榴社區","sis001"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+              <p class="grey" style="margin-top:10px;">明星：  
+                {% set video=["范冰冰","柳岩","闫凤娇","翟凌","杨幂","舒淇","叶玉卿","任达华"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+              <p class="grey" style="margin-top:10px;">经典：  
+                {% set video=["金瓶梅","灯草和尚","聊斋","玉蒲团","满清","三杀","强奸","偷窥"] %}{%for v in video%}
+                <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
+                      
+<p class="grey" style="margin-top:10px;">搜索到【<b>{{query}}</b>】的BT共有<b>{{counts}}</b>条，
+<span><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/rss.gif" alt="rss">&nbsp;&nbsp;
+<a href="/rss/{{query}}.xml" target="_blank" style="color:#E53333;" type="application/rss+xml">{{query}}&nbsp;&nbsp;Rss订阅</a></span></p>
 <div class="list cl">
 	<dl class="cl">
 	<dt><b>资源名:</b></dt>
@@ -55,29 +67,26 @@
 {% if order==1 %} <a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}" class="desc">{%else%}
 <a href="{{url_for('search_results',query=query,category=category,order=1,page=1)}}">{%endif%}大小</a>
   </dd>
-  
-  <dd class="dmagg">
+  <dd class="dsize">
 {% if order==2 %} <a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}" class="asc active">{%else%}
-<a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}">{%endif%}时间</a>
+<a href="{{url_for('search_results',query=query,category=category,order=2,page=1)}}">{%endif%}最后访问</a>
       </dd>
- <dd class="dsize">
+ <dd class="dmagg">
 	 {% if order==3 %} <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}" class="desc">{%else%}
- <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}">{%endif%}热度</a>
+ <a href="{{url_for('search_results',query=query,category=category,order=3,page=1)}}" style="color:#E53333;">{%endif%}热度</a>
   </dd>
-		
     {% for hash in hashs %}
-        <dt ><img src="//css97ss.qiniudn.com/torrent.gif" class="ico">
-		<a title="{% for x in hash.name|fenci(10) %}{{x}},{% endfor %}" href="{{url_for('detail',info_hash=hash.info_hash)}}"><span> {{hash.name}}</span></a></dt>
+        <dt ><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/torrent.gif" class="ico">
+		<a href="{{url_for('detail',info_hash=hash.info_hash)}}"><span> {{hash.name}}</span></a></dt>
         <dd class="dsize">{% if hash['length']>1073741824 %}
 {{(hash['length']/1073741824)|round(2)}} GB
 {% else %}{{(hash['length']/1048576)|round(2)}} MB
 {%endif%}</dd>
-        <dd class="dmagg">{{ moment(hash['last_seen']|todate).fromNow(refresh=True) }}</dd>
-        <dd class="dsize">{{hash['requests']}}</dd>
+        <dd class="dsize">{{hash['last_seen']|todate}}</dd>
+        <dd class="dmagg">{{hash['requests']}} ℃</dd>
 	{% endfor %}
-          </dl>            
-     <dl>
-       </dl>
+          </dl>
+     <dl></dl>
   </div>
  <p class="cl">
      <div class="pagination">
@@ -118,16 +127,9 @@
 <li><a href="#">下一页</a></li>
 {%endif%}
     {%endif%}
-                </ul>
-</div>
-</p>
-  </div>
-</div>
-</div>
-
-	<p>
-	<br />
-</p>
+</ul> </div></p>
+<p class="grey" style="margin-top:10px;">热门搜索：{% for tag in tags[-100:] %}
+<a href="{{url_for('search_results',query=tag.tag,category=1,order=3,page=1)}}"><font size="3" color="#039203">{{tag.tag}}</font></a>&nbsp;&nbsp;{% endfor %}</p></div></div></div><p><br /></p>
 {%include'footer.html'%}
 </body>
 </html>
