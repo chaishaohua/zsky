@@ -499,6 +499,7 @@ def search_results(query,category,order,page=1):
     return render_template('list.html',form=form,query=query,pages=pages,page=page,category=category,order=order,hashs=searchresult,counts=counts,categorycounts=categorycounts,taketime=taketime,tags=tags,sitename=sitename)
 
 
+
 @app.route('/search',methods=['GET','POST'])
 def search():
     form=SearchForm()
@@ -542,7 +543,7 @@ def detail(info_hash):
   
   
 
-@app.route('/download/<info_hash>',methods=['GET','POST'])
+@app.route('/download/<info_hash>.html',methods=['GET','POST'])
 def download(info_hash):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
@@ -557,27 +558,6 @@ def download(info_hash):
         return render_template('complaintdetail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename) 
     return render_template('download.html',hash=hash,sitename=sitename)
 
-@app.route('/sitemap.xml')
-def sitemap():    
-    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    curr = conn.cursor()
-    querysql='SELECT info_hash,create_time FROM film order by create_time desc limit 200'
-    curr.execute(querysql)
-    rows=curr.fetchall()
-    curr.close()
-    conn.close()
-    sitemaplist=[]
-    for row in rows:
-        info_hash = row['info_hash']
-        mtime = datetime.datetime.fromtimestamp(int(row['create_time'])).strftime('%Y-%m-%d')
-        url = request.url_root+'cvyun/{}.html'.format(info_hash)
-        url_xml = '<url><loc>{}</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(url, mtime)
-        sitemaplist.append(url_xml)
-    xml_content = '<?xml version="1.0" encoding="UTF-8"?><urlset>{}</urlset>'.format("".join(x for x in sitemaplist))
-    with open('static/sitemap.xml', 'wb') as f:
-        f.write(xml_content)
-        f.close()
-    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.route('/dmca/<info_hash>',methods=['GET','POST'])
 def dmca(info_hash):
@@ -603,7 +583,11 @@ def dmca(info_hash):
 @app.route('/robots.txt')
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
-
+  
+@app.route('/map/<sitemap>')
+def sitemap(sitemap):
+    return send_from_directory('map', sitemap)
+  
 @app.route('/uploads/nvyou/<filename>')
 def nvyoupics(filename):
     return send_from_directory(nvyoupath, filename)
