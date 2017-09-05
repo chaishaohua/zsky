@@ -11,7 +11,7 @@ DB_PORT_SPHINX=9306
 DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
-domain="http://139.159.231.41/"
+domain="http://www.026001.cn/"
 
 if not os.path.exists('map'):
     os.mkdir('map')
@@ -39,7 +39,7 @@ for i in range(1,pages+1):
    urlsql='SELECT info_hash FROM search_hash order by id desc limit %s,5000'
    curr.execute(urlsql,(i-1)*5000)
    urlhash=curr.fetchall()
-   url="".join(['<url><loc>{}cvyun/{}.html</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(domain,info_hash['info_hash'], mtime) for info_hash in urlhash ])
+   url="".join(['<url><loc>{}hash/{}.html</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(domain,info_hash['info_hash'], mtime) for info_hash in urlhash ])
    urlset = '<?xml version="1.0" encoding="utf-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{}</urlset>'.format(url)
    with open('map/sitemap{}.xml'.format(i), 'wb') as f_urlset:
        f_urlset.write(urlset)
