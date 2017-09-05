@@ -465,7 +465,7 @@ def new():
     return render_template('new.html',form=form,newest=newest,tags=tags,sitename=sitename)
 
 
-@app.route('/cvyun-<query>-<int:category>-<int:order>-<int:page>.html',methods=['GET','POST'])
+@app.route('/btsoso-<query>-<int:category>-<int:order>-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results(query,category,order,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
@@ -509,7 +509,7 @@ def search():
     return redirect(url_for('search_results',query=query,category=0,order=0,page=1))
 
 
-@app.route('/cvyun/<info_hash>.html',methods=['GET','POST'])
+@app.route('/hash/<info_hash>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(info_hash):
     form=SearchForm()
