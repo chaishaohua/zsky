@@ -529,7 +529,18 @@ def detail(info_hash):
         return redirect(url_for('index'))
     if Complaint.query.filter_by(info_hash=info_hash).first():
         return render_template('complaintdetail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename) 
+    fenci_list=jieba.analyse.extract_tags(hash['name'], 100)
+    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+    currzsky = connzsky.cursor()
+    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
+    for x in fenci_list:
+        currzsky.execute(taginsertsql,x)
+    connzsky.commit()
+    currzsky.close()
+    connzsky.close()
     return render_template('detail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename)
+  
+  
 
 @app.route('/download/<info_hash>',methods=['GET','POST'])
 def download(info_hash):
@@ -722,7 +733,7 @@ class FanhaoFile(FileAdmin):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
-admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/haoyue'))
 admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='热门番号',category='番号'))
 admin.add_view(FanhaoFile(fanhaopath, '/uploads/fanhao', name='番号图片',category='番号'))
