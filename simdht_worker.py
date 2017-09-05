@@ -388,6 +388,6 @@ if __name__ == "__main__":
     rpcthread.setDaemon(True)
     rpcthread.start()
 
-    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=100)
+    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=100000)
     dht.start()
     dht.auto_send_find_node()
