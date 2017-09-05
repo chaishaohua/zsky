@@ -7,14 +7,7 @@
         {% if current_user.is_authenticated %}
         <h4>{{current_user.name}} 欢迎回来！</h4>
         <p class="lead"></p>
-<span class="label label-success">数据概览</span><p>
-	<div class="alert alert-success alert-dismissable">
-	</h4> 共爬取到 {{total}} 条资源, 今日新增 {{today}} 条
-			</div>    
-<span class="label label-info">爬虫日志</span><p>
-<div style="padding: 10px;font-weight: 200;line-height: 30px;color: inherit;background-color: #eee;-webkit-borde">	 
-{{ htmlbody|safe }}
-</div>
+<p>
         {% else %}
         <form method="POST" action="">
             {{ form.hidden_tag() if form.hidden_tag }}
