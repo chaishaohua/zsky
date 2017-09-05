@@ -4,27 +4,28 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>今日最热门的200个BT种子 -{{sitename}}- 男人都爱上的磁力连接搜索引擎</title>
-  <meta name="keywords" content="{{sitename}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎">
-  <meta name="description" content="{{sitename}}搜索引擎是功能强大的磁力搜索引擎，牛逼的番号搜索、磁力搜索功能，更好用的BT种子搜索引擎！男人都爱上>的磁力搜索引擎">
+  <title>今日最热门的200个BT种子 -{{sitename}}新网址,中文版{{sitename}},电影BT种子,快播种子,快播资源下载,BT种子下载网站,{{sitename}}BT下载</title>
+  <meta name="keywords" content="{{sitename}},宅男BT,宅男磁力,宅男福利,磁力搜索,番号搜索,番号搜索引擎,磁力链接,BT种子,BT种子搜索,BT搜索引擎,种子搜索神器,磁力链接搜索,磁力链接搜索引擎"  />
+  <meta name="description" content="撸友正在{{sitename}}搜索：...等热门女明星">
   <meta name="renderer" content="webkit">
   <meta http-equiv="Cache-Control" content="no-siteapp"/>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="{{sitename}}-男人都爱上的磁力连接搜索引擎"/>
-  <link type="text/css" rel="stylesheet" href="//css12345.qiniudn.com/btzhizhu.css" />
-  <link rel="stylesheet" href="//dg12.qiniudn.com/amazeui.custom.min.css">
-  <link rel="stylesheet" href="//dg12.qiniudn.com/app.css">
-  <link rel="shortcut icon" href="//css.315g.cn/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="//dg12.qiniudn.com/favicon.ico" type="image/x-icon">
+  <link type="text/css" rel="stylesheet" href="//url123456.oss-cn-shenzhen.aliyuncs.com/btzhizhu.css" />
+  <link rel="stylesheet" href="//url123456.oss-cn-shenzhen.aliyuncs.com/amazeui.custom.min.css">
+  <script type="text/javascript" src="//url123456.oss-cn-shenzhen.aliyuncs.com/jquery-1.8.3.min.js"></script>
+  <link rel="stylesheet" href="//url123456.oss-cn-shenzhen.aliyuncs.com/app.css">
+  <link rel="shortcut icon" href="//url123456.oss-cn-shenzhen.aliyuncs.com/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//url123456.oss-cn-shenzhen.aliyuncs.com/favicon.ico" type="image/x-icon">
 </head>
 {%include'head.html'%}
     <div class="mainbox">
   <div class="conbox pdlr20">
     <div class="shead cl">
 <form name="search" class="main-search form-search text-center" method="POST" action="{{url_for('search')}}">
- <div class="q-input">
+ <div class="q-input" data-am-sticky>
         {{form.hidden_tag()}}
    {{form.search(id="kw",class="search-query",placeholder="电影，音乐，小说，文件，图片",required="required",autocomplete = "on" ,autofocus="autofocus")}}
        <input type="submit" id="btnSearch" value="搜索" class="btn">
@@ -49,7 +50,7 @@
 <div class="notice am-margin-top-sm">
     <div class="am-panel am-panel-default">
       <div class="am-panel-bd">
-        <h2><img src="//dg12.qiniudn.com/hot.png" alt="day_popular">24小时最热门的200个BT种子磁力链接</h2>
+        <h2><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/hot.png" alt="day_popular">24小时最热门的200个BT种子磁力链接</h2>
       </div>
     </div>
   </div>
@@ -59,7 +60,7 @@
     <div class="search_list">
     {% for hash in dayhot %}
             <dl class="detail">
-            <dt><span class="red fb"><img src="//dg12.qiniudn.com/new.gif" alt="new">【{{ hash['category'] }}】</span>
+            <dt><span class="red fb"><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/new.gif" alt="new">【{{ hash['category'] }}】</span>
 <a href="{{url_for('detail',info_hash=hash.info_hash)}}" target="_blank"><span> {{hash.name}}</span></a></dt>
             <dd class="info">
                 <span>收录时间:<b>{{ hash['create_time']|todate }}</b></span>
@@ -88,7 +89,7 @@
 {% endfor %}
 
             </ul>
-<dd class="like"><img src="//dg12.qiniudn.com/heart.png" alt="heart"><span>猜你喜欢：
+<dd class="like"><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/heart.png" alt="heart"><span>猜你喜欢：
 {% for x in hash.name|fenci(10) %}
 <a href="{{url_for('search_results',query=x,category=0,order=0,page=1)}}" target="_blank">{{x}}</a>
 {% endfor %}
