@@ -12,7 +12,6 @@ import codecs
 import time
 import os
 import datetime
-from flask_moment import Moment
 from flask import Flask,request,render_template,session,g,url_for,redirect,flash,current_app,jsonify,send_from_directory
 from flask_login import LoginManager,UserMixin,current_user,login_required,login_user,logout_user
 from flask_sqlalchemy import SQLAlchemy
@@ -66,7 +65,7 @@ cache = Cache(app,config = {
     'CACHE_REDIS_PASSWORD': ''
 })
 cache.init_app(app)
-moment = Moment(app)
+
 
 DB_HOST='127.0.0.1'
 DB_NAME_MYSQL='zsky'
@@ -77,7 +76,7 @@ DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
 
-sitename="磁力管家"
+sitename="磁力猪-番号搜索,BT种子磁力搜索网站,cvyun迅雷磁力链接搜索引擎"
 
 class LoginForm(FlaskForm):
     name=StringField('用户名',validators=[DataRequired(),Length(1,32)])
@@ -199,7 +198,7 @@ def make_cache_key(*args, **kwargs):
 
 
 def todate_filter(s):
-    return datetime.datetime.fromtimestamp(int(s))
+    return datetime.datetime.fromtimestamp(int(s)).strftime('%Y-%m-%d')
 app.add_template_filter(todate_filter,'todate')
 
 def fromjson_filter(s):
@@ -306,6 +305,39 @@ def newestcache():
     conn.close()
     return newest
 
+#@cache.cached(60*60,key_prefix="keywords_cache")
+#def keywordscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    keywordsquerysql='SELECT * FROM keywords order by id desc  LIMIT 300'
+#    curr.execute(keywordsquerysql)
+#    keywords=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return keywords
+#
+#@cache.cached(60*60,key_prefix="actors_cache")
+#def actorscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    actorsquerysql='SELECT * FROM actors order by id desc  LIMIT 300'
+#    curr.execute(actorsquerysql)
+#    actors=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return actors
+#
+#def tagscache():
+#    conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
+#    curr = conn.cursor()
+#    tagssql=' SELECT * FROM tags order by id desc limit 300'
+#    curr.execute(tagssql)
+#    tags=curr.fetchall()
+#    curr.close()
+#    conn.close()
+#    return tags
+
+
 
 
 @app.route('/',methods=['GET','POST'])
@@ -322,7 +354,6 @@ def index():
     randomRow = query.offset(int(rowCount*random.random())).limit(40)
     #todaysql='select sum(new_hashes) from search_statusreport where to_days(search_statusreport.date)= to_days(now())'
     today=db.session.query(func.sum(Search_Statusreport.new_hashes)).filter(cast(Search_Statusreport.date,Date) == datetime.date.today()).scalar()
-
     return render_template('index.html',form=form,today=today,total=total,tags=tags,keywords=keywords,actors=randomRow,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename)
 
 
@@ -434,7 +465,7 @@ def new():
     return render_template('new.html',form=form,newest=newest,tags=tags,sitename=sitename)
 
 
-@app.route('/search-<query>-<int:category>-<int:order>-<int:page>.html',methods=['GET','POST'])
+@app.route('/cvyun-<query>-<int:category>-<int:order>-<int:page>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def search_results(query,category,order,page=1):
     connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
@@ -447,7 +478,7 @@ def search_results(query,category,order,page=1):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     sqlpre=' SELECT * FROM film WHERE match(%s) '
-    sqlend=' limit %s,50 OPTION max_matches=50000 '
+    sqlend=' limit %s,20 OPTION max_matches=20000 '
     searchsql=sqlpre + categoryquery[category] + sorts[order] +sqlend
     curr.execute(searchsql,(query,(page-1)*20))
     searchresult=curr.fetchall()
@@ -477,7 +508,7 @@ def search():
     return redirect(url_for('search_results',query=query,category=0,order=0,page=1))
 
 
-@app.route('/hash/<info_hash>.html',methods=['GET','POST'])
+@app.route('/cvyun/<info_hash>.html',methods=['GET','POST'])
 #@cache.cached(timeout=60*60,key_prefix=make_cache_key)
 def detail(info_hash):
     form=SearchForm()
@@ -498,18 +529,9 @@ def detail(info_hash):
         return redirect(url_for('index'))
     if Complaint.query.filter_by(info_hash=info_hash).first():
         return render_template('complaintdetail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename) 
-    fenci_list=jieba.analyse.extract_tags(hash['name'], 100)
-    connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-    currzsky = connzsky.cursor()
-    taginsertsql = 'REPLACE INTO search_tags(tag) VALUES(%s)'
-    for x in fenci_list:
-        currzsky.execute(taginsertsql,x)
-    connzsky.commit()
-    currzsky.close()
-    connzsky.close()
     return render_template('detail.html',form=form,tags=tags,hash=hash,keywords=keywords,actors=actors,dayhot=dayhot,weekhot=weekhot,newest=newest,sitename=sitename)
 
-@app.route('/download/<info_hash>.html',methods=['GET','POST'])
+@app.route('/download/<info_hash>',methods=['GET','POST'])
 def download(info_hash):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
@@ -537,7 +559,7 @@ def sitemap():
     for row in rows:
         info_hash = row['info_hash']
         mtime = datetime.datetime.fromtimestamp(int(row['create_time'])).strftime('%Y-%m-%d')
-        url = request.url_root+'hash/{}.html'.format(info_hash)
+        url = request.url_root+'cvyun/{}.html'.format(info_hash)
         url_xml = '<url><loc>{}</loc><lastmod>{}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>'.format(url, mtime)
         sitemaplist.append(url_xml)
     xml_content = '<?xml version="1.0" encoding="UTF-8"?><urlset>{}</urlset>'.format("".join(x for x in sitemaplist))
@@ -716,6 +738,7 @@ admin.add_view(UserView(User, db.session,name='用户管理'))
 def init_db():
     db.create_all()
     db.session.commit()
+
 
 @manager.option('-u', '--name', dest='name')
 @manager.option('-e', '--email', dest='email')
