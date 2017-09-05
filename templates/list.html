@@ -56,10 +56,7 @@
               <p class="grey" style="margin-top:10px;">经典：  
                 {% set video=["金瓶梅","灯草和尚","聊斋","玉蒲团","满清","三杀","强奸","偷窥"] %}{%for v in video%}
                 <a href="{{url_for('search_results',query=v,category=0,order=3,page=1)}}" style="color:#039203;">{{v}}</a>{%endfor%}</p>
-                      
-<p class="grey" style="margin-top:10px;">搜索到【<b>{{query}}</b>】的BT共有<b>{{counts}}</b>条，
-<span><img src="//url123456.oss-cn-shenzhen.aliyuncs.com/rss.gif" alt="rss">&nbsp;&nbsp;
-<a href="/rss/{{query}}.xml" target="_blank" style="color:#E53333;" type="application/rss+xml">{{query}}&nbsp;&nbsp;Rss订阅</a></span></p>
+
 <div class="list cl">
 	<dl class="cl">
 	<dt><b>资源名:</b></dt>
