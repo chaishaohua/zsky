@@ -76,7 +76,7 @@ DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
 
-sitename="磁力猪-番号搜索,BT种子磁力搜索网站,cvyun迅雷磁力链接搜索引擎"
+sitename="海盗湾"
 
 class LoginForm(FlaskForm):
     name=StringField('用户名',validators=[DataRequired(),Length(1,32)])
@@ -478,7 +478,7 @@ def search_results(query,category,order,page=1):
     conn = pymysql.connect(host=DB_HOST,port=DB_PORT_SPHINX,user=DB_USER,password=DB_PASS,db=DB_NAME_SPHINX,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
     curr = conn.cursor()
     sqlpre=' SELECT * FROM film WHERE match(%s) '
-    sqlend=' limit %s,20 OPTION max_matches=20000 '
+    sqlend=' limit %s,20 OPTION max_matches=2000 '
     searchsql=sqlpre + categoryquery[category] + sorts[order] +sqlend
     curr.execute(searchsql,(query,(page-1)*20))
     searchresult=curr.fetchall()
@@ -506,7 +506,7 @@ def search():
     query=re.sub(r"(['`=\(\)|\-!@~\"&/\\\^\$])", r"\\\1", form.search.data)
     if not form.search.data:
         return redirect(url_for('index'))
-    return redirect(url_for('search_results',query=query,category=0,order=0,page=1))
+    return redirect(url_for('search_results',query=query,category=0,order=3,page=1))
 
 
 @app.route('/hash/<info_hash>.html',methods=['GET','POST'])
