@@ -11,7 +11,7 @@ DB_PORT_SPHINX=9306
 DB_USER='root'
 DB_PASS=''
 DB_CHARSET='utf8mb4'
-domain="http://www.026001.cn/"
+domain="http://www.0276789.com/"
 
 if not os.path.exists('map'):
     os.mkdir('map')
