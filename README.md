@@ -4,7 +4,7 @@
 ```Bash
 yum -y install git 
 
-git  clone http://62.210.244.115:3000/a54425415/zsky.git
+git  clone http://git.oschina.net/qianghongbao/zsky.git
 
 cd zsky&&sh zsky.sh
 ```
@@ -13,7 +13,7 @@ cd zsky&&sh zsky.sh
 ```Bash
 apt-get -y install git 
 
-git  clone http://62.210.244.115:3000/a54425415/zsky.git
+git  clone http://git.oschina.net/qianghongbao/zsky.git
 
 cd zsky&&sh zsky_debian.sh
 ```
