@@ -23,6 +23,9 @@ cd zsky&&sh zsky_debian.sh
 
 >后台地址 http://IP/admin 
 
+原作者gitub
+
+https://github.com/wenguonideshou/zsky
 
 
 **Q：如何给首页的推荐影片添加图片、评分？**
