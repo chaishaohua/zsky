@@ -602,30 +602,6 @@ def notfound(e):
 
 
 class MyAdminIndexView(AdminIndexView):
-    @expose('/')
-    def index(self):
-        if not current_user.is_authenticated:
-            return redirect(url_for('admin.login_view'))
-        connzsky = pymysql.connect(host=DB_HOST,port=DB_PORT_MYSQL,user=DB_USER,password=DB_PASS,db=DB_NAME_MYSQL,charset=DB_CHARSET,cursorclass=pymysql.cursors.DictCursor)
-        currzsky = connzsky.cursor()
-        totalsql = 'select count(id) from search_hash'
-        currzsky.execute(totalsql)
-        totalcounts=currzsky.fetchall()
-        total=int(totalcounts[0]['count(id)'])
-        todaysql='select count(id) from search_hash where to_days(search_hash.create_time)= to_days(now())'
-        currzsky.execute(todaysql)
-        todaycounts=currzsky.fetchall()
-        today=int(todaycounts[0]['count(id)'])
-        currzsky.close()
-        connzsky.close()
-        logfile=os.path.join(os.path.dirname(__file__),'spider.log')
-        if os.path.exists(logfile):
-            body = codecs.open(logfile, 'r' ,encoding='utf-8', errors='ignore').readlines()[-20:]
-        else:
-            os.mknod(logfile)
-            body = codecs.open(logfile, 'r',encoding='utf-8' , errors='ignore').readlines()[-20:]
-        htmlbody = '\n'.join('<p>%s</p>' % line for line in body)
-        return self.render('admin/index.html',total=total,today=today,htmlbody=htmlbody)
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
         form = LoginForm(request.form)
@@ -646,6 +622,9 @@ class MyAdminIndexView(AdminIndexView):
     def logout_view(self):
         logout_user()
         return redirect(url_for('admin.index'))
+
+    
+
 
 
 class TagsView(ModelView):
