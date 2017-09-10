@@ -647,23 +647,6 @@ class MyAdminIndexView(AdminIndexView):
         logout_user()
         return redirect(url_for('admin.index'))
 
-    
-class HashView(ModelView):
-    create_modal = True
-    edit_modal = True
-    can_export = True
-    column_searchable_list = ['name']
-    def get_list(self, *args, **kwargs):
-        count, data = super(HashView, self).get_list(*args, **kwargs)
-        count=10000
-        return count,data
-    def is_accessible(self):
-        if current_user.is_authenticated :
-            return True
-        return False
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('admin.login_view'))
-
 
 class TagsView(ModelView):
     create_modal = True
@@ -717,8 +700,7 @@ class FanhaoFile(FileAdmin):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
-admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
-admin.add_view(HashView(Search_Hash, db.session,name='磁力Hash'))
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/haoyue'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='热门番号',category='番号'))
 admin.add_view(FanhaoFile(fanhaopath, '/uploads/fanhao', name='番号图片',category='番号'))
 admin.add_view(KeywordsView(Search_Actors, db.session,name='女优大全',category='女优'))
