@@ -21,7 +21,7 @@ cd zsky&&sh zsky_debian.sh
 
 >安装过程中会提示输入管理员用户名、密码、邮箱，输入后耐心等待即可访问 http://IP 
 
->后台地址 http://IP/admin 
+>后台地址 http://IP/admin/login 
 
 原作者gitub
 
