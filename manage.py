@@ -679,7 +679,7 @@ class FanhaoFile(FileAdmin):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('admin.login_view'))
 
-admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/haoyue'))
+admin = Admin(app,name='管理中心',base_template='admin/my_master.html',index_view=MyAdminIndexView(name='首页',template='admin/index.html',url='/admin'))
 admin.add_view(KeywordsView(Search_Keywords, db.session,name='热门番号',category='番号'))
 admin.add_view(FanhaoFile(fanhaopath, '/uploads/fanhao', name='番号图片',category='番号'))
 admin.add_view(KeywordsView(Search_Actors, db.session,name='女优大全',category='女优'))
