@@ -50,17 +50,15 @@ echo ulimit -HSn 65536 >> /etc/rc.local
 echo ulimit -HSn 65536 >>/root/.bash_profile
 ulimit -HSn 65536
 #如果提示没有pip命令,或者你使用linode的主机,请取消下面4行的注释
-yum -y update
-yum -y install git
-wget -qO /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-yum clean metadata
-yum makecache
+#wget -qO /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+#wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+#yum clean metadata
+#yum makecache
 yum -y install wget gcc gcc-c++ python-devel mariadb mariadb-devel mariadb-server
 yum -y install psmisc net-tools lsof epel-release
 yum -y install python-pip
 yum -y install redis
-pip install -r requirements.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt
 cd /root/zsky
 mkdir -p /root/zsky/uploads  /root/zsky/uploads/nvyou  /root/zsky/uploads/nvyou
 \cp -rpf systemctl/gunicorn.service  systemctl/indexer.service  systemctl/searchd.service /etc/systemd/system
@@ -88,12 +86,12 @@ nginx -s reload
 systemctl start gunicorn
 systemctl enable gunicorn
 #启动爬虫,开启日志并在后台运行
-nohup python /root/zsky/simdht_worker.py >/root/zsky/spider.log 2>&1& 
+nohup python /root/zsky/simdht_worker.py >/dev/zero 2>&1&
 #编译sphinx,启动索引,启动搜索进程
 yum -y install git gcc cmake automake g++ mysql-devel
-git clone https://github.com/wenguonideshou/sphinx-jieba.git
+git clone https://github.com/12345bt/sphinx-jieba.git
 cd sphinx-jieba
-git clone https://github.com/wenguonideshou/cppjieba.git
+git clone https://github.com/12345bt/cppjieba.git
 ./configure --prefix=/usr/local/sphinx-jieba
 \cp -r cppjieba/include/cppjieba src/ 
 \cp -r cppjieba/deps/limonp src/ 
@@ -117,7 +115,7 @@ echo "systemctl start  nginx.service" >> /etc/rc.local
 echo "systemctl start  gunicorn.service" >> /etc/rc.local
 echo "systemctl start  indexer.service" >> /etc/rc.local
 echo "systemctl start  searchd.service" >> /etc/rc.local
-echo "nohup python /root/zsky/simdht_worker.py>/root/zsky/spider.log 2>&1&" >> /etc/rc.local
+echo "nohup python /root/zsky/simdht_worker.py>/dev/zero 2>&1&" >> /etc/rc.local
 echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.local
 #设置计划任务,每天早上5点进行主索引
 yum -y install  vixie-cron crontabs
