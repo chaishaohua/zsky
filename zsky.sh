@@ -10,7 +10,17 @@ DBNAME="zsky"
 if [ $(id -u) != "0" ]; then
     echo "当前非root用户登录系统， 请使用root用户运行此脚本!"
     exit 1
-fi	
+fi
+grep SwapTotal /proc/meminfo
+if [ $? -ne 0 ]
+then
+	echo "主机没有swap, 将自动创建swap"
+	fallocate -l 1G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile
+	swapon /swapfile
+	echo '/swapfile   swap    swap    sw  0   0' >> /etc/fstab
+fi
 \cp -rpf /usr/share/zoneinfo/Asia/Chongqing /etc/localtime
 systemctl stop firewalld.service  
 systemctl disable firewalld.service   
